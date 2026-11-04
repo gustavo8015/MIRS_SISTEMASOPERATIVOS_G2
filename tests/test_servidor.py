@@ -77,3 +77,34 @@ class PruebasApi(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class PruebasDescubrimiento(unittest.TestCase):
+    def test_responde_a_la_busqueda_con_nombre_y_puerto(self):
+        import socket
+        from mirs.servidor import RespuestaBusqueda
+        resp = RespuestaBusqueda(EQUIPO, 8765, puerto_udp=0, host="127.0.0.1")
+        resp.start()
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as cliente:
+                cliente.settimeout(2)
+                cliente.sendto(b"MIRS_BUSCAR", ("127.0.0.1", resp.puerto))
+                datos, _ = cliente.recvfrom(1024)
+            r = json.loads(datos)
+            self.assertEqual((r["servicio"], r["nombre_host"], r["puerto"]), ("MIRS", "equipo-prueba", 8765))
+        finally:
+            resp.detener()
+
+    def test_ignora_otros_mensajes(self):
+        import socket
+        from mirs.servidor import RespuestaBusqueda
+        resp = RespuestaBusqueda(EQUIPO, 8765, puerto_udp=0, host="127.0.0.1")
+        resp.start()
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as cliente:
+                cliente.settimeout(0.8)
+                cliente.sendto(b"HOLA", ("127.0.0.1", resp.puerto))
+                with self.assertRaises(socket.timeout):
+                    cliente.recvfrom(1024)
+        finally:
+            resp.detener()
