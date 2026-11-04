@@ -9,7 +9,7 @@ Proyecto de aula (ABP) de la asignatura **Sistemas Operativos**, Ingeniería de 
 | Autores | Gustavo Adolfo Cardona Bayona · Jonathan Soler Guevara · Sebastián Torrez Florez |
 | Lenguaje | Python 3.10 o superior (PC) y Java (app Android) |
 | Plataforma | Windows 10/11 (el núcleo de lectura también funciona en Linux); app para Android 8.0 o superior |
-| Estado | Versión 0.2.0: monitoreo continuo, alertas, API y app móvil |
+| Estado | Versión 0.3.0: monitoreo continuo, alertas, API, app móvil, búsqueda de equipos e instalador para Windows |
 
 ## Contexto
 
@@ -95,7 +95,17 @@ Al igual que la interfaz del PC, la app separa la red de la pantalla: las consul
 | `GET /api/umbrales` | Umbrales configurados |
 | `POST /api/alertas/<id>` | Cuerpo `{"estado": "ATENDIDA"}` o `{"estado": "DESCARTADA"}` |
 
-El servidor usa solo la biblioteca estándar de Python (`http.server`). No tiene autenticación: por defecto escucha únicamente en el propio PC (127.0.0.1), que es lo que necesita el emulador; la opción `--lan` lo abre a la red WiFi para un celular físico.
+El servidor usa solo la biblioteca estándar de Python (`http.server`). No tiene autenticación: por defecto escucha únicamente en el propio PC (127.0.0.1), que es lo que necesita el emulador; la opción `--lan` lo abre a la red para otros equipos y celulares.
+
+### Búsqueda de equipos
+
+El botón de lupa de la app (**Buscar equipos**) encuentra los PC que tienen el servidor abierto, sin escribir la IP:
+
+1. Prueba `http://10.0.2.2:8765`, que en el emulador es el PC donde corre Android Studio.
+2. Envía por difusión UDP el mensaje `MIRS_BUSCAR` al puerto 8766 de toda la red. Cada servidor abierto en modo red (`--lan` o `MIRS_Servidor.exe`) responde con su nombre, su sistema operativo y su puerto.
+3. Muestra la lista y, al tocar un equipo, la app se conecta a él y recuerda la dirección.
+
+Las redes de universidades y empresas suelen bloquear la difusión o la comunicación entre equipos. En ese caso la búsqueda no encuentra nada y la dirección se escribe a mano con el botón de servidor.
 
 ## Base de datos
 
@@ -143,6 +153,8 @@ MIRS_SISTEMASOPERATIVOS_G2/
 │   ├── planificador.py    hilo de muestreo en segundo plano
 │   └── servidor.py        monitoreo continuo y API para la app móvil
 ├── android/               app MIRS Móvil (proyecto de Android Studio)
+├── mirs_servidor.py       punto de entrada de MIRS_Servidor.exe
+├── .github/workflows/     construcción automática del .exe en Windows
 ├── database/schema.sql    esquema de las seis tablas
 ├── tests/                 pruebas unitarias
 ├── datos/                 aquí se crea mirs.db (no se versiona)
@@ -170,6 +182,24 @@ python -m mirs --muestras 5          # toma 5 muestras, las imprime y las guarda
 
 Opciones: `--intervalo 2` (segundos entre muestras) y `--bd ruta\archivo.db`. Algunos procesos del sistema pertenecen a otro usuario; psutil no puede leerlos sin permisos de administrador y el recolector los omite sin detenerse.
 
+### Instalar en otros computadores (sin Python)
+
+Cada PC que se quiera monitorear necesita su propio servidor, porque es el que lee su CPU, su memoria y sus procesos.
+
+1. Descargue `MIRS_Servidor.exe` desde la sección **Releases** de este repositorio.
+2. Ábralo con doble clic. Se abre una ventana que monitorea el PC cada 2 segundos y muestra su dirección en la red. Déjela abierta.
+3. Si aparece **"Windows protegió su PC"**, elija **Más información** y **Ejecutar de todas formas**: el programa no tiene firma digital. Si el firewall pregunta, permita el acceso en **redes privadas**.
+4. En la app, toque **Buscar equipos** o escriba `http://IP-del-PC:8765`.
+
+El historial de ese PC queda en la carpeta `datos` junto al `.exe`. En equipos con **Smart App Control** activado, Windows puede bloquear el `.exe` porque no tiene firma; ahí use el servidor de Python (`python -m mirs.servidor --lan`).
+
+El `.exe` lo construye GitHub Actions en una máquina Windows (`.github/workflows/servidor-windows.yml`): ejecuta las pruebas, empaqueta con PyInstaller, arranca el `.exe` para comprobar que responde y, cuando se crea una etiqueta `vX.Y.Z`, lo publica en Releases. Para construirlo a mano en Windows:
+
+```powershell
+pip install psutil pyinstaller
+pyinstaller --onefile --name MIRS_Servidor --paths src --add-data "database/schema.sql;database" --collect-submodules mirs mirs_servidor.py
+```
+
 ### Servidor y app móvil
 
 1. **Inicie el servidor en el PC** y deje la ventana abierta:
@@ -182,7 +212,7 @@ Opciones: `--intervalo 2` (segundos entre muestras) y `--bd ruta\archivo.db`. Al
    Debe mostrar `API en http://127.0.0.1:8765/api/estado`. Puede comprobarlo abriendo esa dirección en el navegador.
 2. **Abra la app en Android Studio:** File, Open y elija la carpeta `android`. Espere a que termine la sincronización de Gradle (la primera vez descarga Gradle 8.7 y las dependencias). Si pregunta por el Gradle JDK, use el JDK 17 incluido.
 3. **Ejecute la app** en el emulador con el botón Run. La app usa por defecto `http://10.0.2.2:8765`, la dirección con la que el emulador llega al PC.
-4. **Celular físico** en la misma red WiFi: inicie el servidor con `python -m mirs.servidor --lan`, consulte la IP del PC con `ipconfig` y, en la app, toque el ícono de servidor de la barra superior y escriba `http://IP-del-PC:8765`. Windows puede pedir permiso en el firewall para Python.
+4. **Celular físico u otro PC** en la misma red: inicie el servidor con `python -m mirs.servidor --lan` (o abra `MIRS_Servidor.exe`) y en la app toque **Buscar equipos**. Si no lo encuentra, toque el ícono de servidor y escriba la dirección que muestra la ventana del servidor, por ejemplo `http://192.168.1.25:8765`. Windows puede pedir permiso en el firewall.
 
 Para ver una alerta en la demostración, baje temporalmente el umbral de CPU en la tabla `umbral` (por ejemplo a 30 % y 10 s) o ponga el equipo bajo carga.
 
@@ -192,7 +222,7 @@ Para ver una alerta en la demostración, baje temporalmente el umbral de CPU en 
 python -m unittest discover -s tests -v
 ```
 
-Veintitrés pruebas cubren el recolector (rangos válidos, orden y límite de la lista de procesos, prioridad como entero), el almacenamiento (seis tablas, equipo sin duplicados, un umbral por recurso, llave foránea, `CHECK` de porcentajes y transacción sin procesos huérfanos), las reglas del analizador (umbral sostenido frente a pico corto, desviación del historial y posible fuga de memoria) y la API (estado, historial, umbrales, cambio de estado de una alerta y errores 400 y 404).
+Veinticinco pruebas cubren el recolector (rangos válidos, orden y límite de la lista de procesos, prioridad como entero), el almacenamiento (seis tablas, equipo sin duplicados, un umbral por recurso, llave foránea, `CHECK` de porcentajes y transacción sin procesos huérfanos), las reglas del analizador (umbral sostenido frente a pico corto, desviación del historial y posible fuga de memoria) y la API (estado, historial, umbrales, cambio de estado de una alerta, errores 400 y 404, y respuesta a la búsqueda de equipos por UDP).
 
 ## Hoja de ruta
 
