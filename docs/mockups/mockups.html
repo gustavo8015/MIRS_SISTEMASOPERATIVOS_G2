@@ -1,0 +1,102 @@
+<!doctype html>
+<!-- Mockups de baja/media fidelidad de la interfaz Tkinter de MIRS (datos ilustrativos).
+     Abrir con ?p=panel, ?p=procesos o ?p=alertas. -->
+<html lang="es"><head><meta charset="utf-8"><title>MIRS mockups</title>
+<style>
+:root{--pri:#1E40AF;--sec:#3B82F6;--acc:#D97706;--bad:#DC2626;--ok:#15803D;--bg:#F8FAFC;--fg:#1E293B;--mut:#475569;--bd:#CBD5E1;--card:#fff}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#d5dbe3;font-family:"Liberation Sans",Arial,sans-serif;color:var(--fg);padding:24px}
+.win{width:1100px;height:680px;background:var(--bg);border:1px solid #8a94a3;box-shadow:0 8px 30px rgba(0,0,0,.25);display:flex;flex-direction:column;position:relative}
+.tb{height:34px;background:#fff;border-bottom:1px solid var(--bd);display:flex;align-items:center;padding:0 12px;font-size:13.5px;gap:8px}
+.tb .ctl{margin-left:auto;display:flex;gap:22px;color:#333;font-size:15px}
+.ico{width:18px;height:18px;border-radius:4px;background:var(--pri);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.menu{height:26px;background:#fff;border-bottom:1px solid var(--bd);display:flex;gap:18px;padding:0 12px;align-items:center;font-size:13px}
+.tabs{display:flex;padding:8px 12px 0;gap:2px;border-bottom:1px solid var(--bd)}
+.tab{padding:7px 16px;font-size:13.5px;border:1px solid var(--bd);border-bottom:none;background:#eef1f5;border-radius:4px 4px 0 0;color:var(--mut)}
+.tab.on{background:var(--bg);color:var(--fg);font-weight:700;position:relative;top:1px}
+.tab .b{background:var(--bad);color:#fff;border-radius:8px;padding:0 6px;font-size:11px;margin-left:5px}
+.body{flex:1;padding:14px;overflow:hidden}
+.status{height:26px;border-top:1px solid var(--bd);background:#fff;font-size:12.5px;color:var(--mut);display:flex;align-items:center;gap:22px;padding:0 12px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.k{background:var(--card);border:1px solid var(--bd);border-radius:6px;padding:10px 12px}
+.k h4{font-size:13px;color:var(--mut);font-weight:700;display:flex;justify-content:space-between}
+.k .v{font-size:30px;font-weight:700;margin:4px 0 6px}
+.bar{height:10px;background:#e2e8f0;border-radius:5px;overflow:hidden}.bar i{display:block;height:100%}
+.k .s{font-size:12px;color:var(--mut);margin-top:6px}
+.tag{font-size:11px;font-weight:700;padding:1px 7px;border-radius:9px}
+.t-ok{background:#dcfce7;color:var(--ok)}.t-warn{background:#fef3c7;color:#92400e}.t-bad{background:#fee2e2;color:#991b1b}
+.row2{display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-top:12px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:6px;padding:10px 12px}
+.card h3{font-size:14px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
+.card h3 small{font-weight:400;color:var(--mut);font-size:12px}
+table{width:100%;border-collapse:collapse;font-size:12.8px}
+th{background:#eef2f7;text-align:left;padding:6px 8px;border-bottom:1px solid var(--bd);font-weight:700;color:#334155}
+td{padding:5px 8px;border-bottom:1px solid #edf0f4}
+tr.sel td{background:#dbeafe}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+.btn{display:inline-block;padding:6px 14px;border:1px solid #94a3b8;background:#f1f5f9;border-radius:4px;font-size:13px;margin-right:6px}
+.btn.p{background:var(--pri);color:#fff;border-color:var(--pri)}.btn.d{background:var(--bad);color:#fff;border-color:var(--bad)}
+.tools{display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:13px}
+.inp{border:1px solid #94a3b8;background:#fff;padding:5px 8px;width:220px;color:var(--mut);border-radius:3px}
+.modal-bg{position:absolute;inset:34px 0 0 0;background:rgba(15,23,42,.35)}
+.modal{position:absolute;left:340px;top:200px;width:420px;background:#fff;border:1px solid #64748b;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.modal .mt{background:#fff;border-bottom:1px solid var(--bd);padding:7px 12px;font-size:13px}
+.modal .mb{padding:16px;display:flex;gap:14px;font-size:13.5px;line-height:1.45}
+.warn{flex:0 0 38px;height:38px;border-radius:50%;background:#fef3c7;color:var(--acc);font-weight:900;font-size:24px;display:flex;align-items:center;justify-content:center;border:2px solid var(--acc)}
+.modal .mf{padding:10px 16px 14px;text-align:right}
+.al{display:grid;grid-template-columns:96px 150px 1fr 220px;gap:10px;align-items:start;background:#fff;border:1px solid var(--bd);border-left:5px solid var(--bad);border-radius:5px;padding:10px 12px;margin-bottom:9px;font-size:13px}
+.al.m{border-left-color:var(--acc)}.al.l{border-left-color:var(--sec)}
+.al b{display:block;margin-bottom:2px}.al .r{color:var(--mut);font-size:12.5px;margin-top:3px}
+.legend{font-size:12px;color:var(--mut);display:flex;gap:14px}
+.sw{display:inline-block;width:14px;height:3px;vertical-align:middle;margin-right:5px}
+</style></head><body>
+<div class="win">
+  <div class="tb"><div class="ico">M</div>MIRS · Monitor Inteligente de Recursos del Sistema<div class="ctl"><span>—</span><span>☐</span><span>✕</span></div></div>
+  <div class="menu"><span>Archivo</span><span>Ver</span><span>Herramientas</span><span>Ayuda</span></div>
+  <div class="tabs" id="tabs"></div>
+  <div class="body" id="body"></div>
+  <div class="status"><span>● Monitoreando · intervalo 2 s</span><span>Última muestra: 09:42:16</span><span>Muestras guardadas: 1.284</span><span style="margin-left:auto">Datos ilustrativos · mockup</span></div>
+</div>
+<script>
+const p=new URLSearchParams(location.search).get('p')||'panel';
+const T=[['panel','Panel en vivo'],['procesos','Procesos'],['alertas','Alertas'],['historial','Historial'],['config','Configuración']];
+document.getElementById('tabs').innerHTML=T.map(([k,n])=>`<div class="tab ${k==p?'on':''}">${n}${k=='alertas'?'<span class="b">2</span>':''}</div>`).join('');
+const procs=[[4120,'chrome.exe','running','Normal','52,4','1.812,3',48],[2264,'python.exe','running','Normal','21,0','612,0',6],[8812,'Teams.exe','running','Normal','6,3','734,9',61],[1460,'MsMpEng.exe','running','Normal','3,1','288,4',39],[912,'explorer.exe','running','Alta','1,2','151,7',72],[3380,'Code.exe','sleeping','Normal','0,8','402,5',33],[5024,'OneDrive.exe','sleeping','Baja','0,4','96,1',27]];
+function chart(){ // serie ilustrativa
+  const W=640,H=230,n=150;let cpu=[],ram=[];
+  for(let i=0;i<n;i++){const ruido=((i*37)%7)-3;cpu.push(i<70?34+14*Math.sin(i/9)+ruido:(i<90?40+(i-70)*2.4+ruido:87+ruido*0.6));ram.push(58+i*0.09+(((i*13)%5)-2)*0.6);}
+  const x=i=>40+i*(W-50)/(n-1),y=v=>H-25-(v/100)*(H-40);
+  const path=a=>a.map((v,i)=>(i?'L':'M')+x(i).toFixed(1)+','+y(Math.min(v,99)).toFixed(1)).join('');
+  let g='';for(const v of[0,25,50,75,100])g+=`<line x1="40" x2="${W-10}" y1="${y(v)}" y2="${y(v)}" stroke="#e2e8f0"/><text x="32" y="${y(v)+4}" font-size="11" text-anchor="end" fill="#64748b">${v}</text>`;
+  g+=`<line x1="40" x2="${W-10}" y1="${y(85)}" y2="${y(85)}" stroke="#DC2626" stroke-dasharray="5 4"/><text x="46" y="${y(85)+15}" font-size="11" text-anchor="start" fill="#DC2626">umbral CPU 85 %</text>`;
+  for(const [i,l,a] of [[0,'-5 min','start'],[60,'-3 min','middle'],[119,'-1 min','middle'],[149,'ahora','end']])g+=`<text x="${x(i)}" y="${H-6}" font-size="11" text-anchor="${a}" fill="#64748b">${l}</text>`;
+  return `<svg width="${W}" height="${H}">${g}<path d="${path(ram)}" fill="none" stroke="#D97706" stroke-width="2"/><path d="${path(cpu)}" fill="none" stroke="#1E40AF" stroke-width="2.2"/></svg>`;}
+const masConsumo=procs.slice(0,5).map(r=>`<tr><td>${r[1]}</td><td class="num">${r[4]}</td><td class="num">${r[5]}</td></tr>`).join('');
+const B=document.getElementById('body');
+if(p=='panel'){B.innerHTML=`
+<div class="kpis">
+ <div class="k"><h4>CPU <span class="tag t-bad">Alerta</span></h4><div class="v">87 %</div><div class="bar"><i style="width:87%;background:#DC2626"></i></div><div class="s">8 núcleos · sobre 85 % hace 2 min</div></div>
+ <div class="k"><h4>Memoria RAM <span class="tag t-warn">Vigilar</span></h4><div class="v">71 %</div><div class="bar"><i style="width:71%;background:#D97706"></i></div><div class="s">11,3 de 15,9 GB · en aumento</div></div>
+ <div class="k"><h4>Disco C:\\ <span class="tag t-ok">Normal</span></h4><div class="v">41 %</div><div class="bar"><i style="width:41%;background:#15803D"></i></div><div class="s">195 de 476 GB usados</div></div>
+ <div class="k"><h4>Red <span class="tag t-ok">Normal</span></h4><div class="v" style="font-size:24px;margin:9px 0 10px">↑ 120 · ↓ 2.340</div><div class="s">kbps envío · recepción</div></div>
+</div>
+<div class="row2">
+ <div class="card"><h3>Uso en los últimos 5 minutos <span class="legend"><span><i class="sw" style="background:#1E40AF"></i>CPU %</span><span><i class="sw" style="background:#D97706"></i>RAM %</span></span></h3>${chart()}</div>
+ <div class="card"><h3>Mayor consumo <small>actualizado cada 2 s</small></h3><table><tr><th>Proceso</th><th class="num">CPU %</th><th class="num">RAM MB</th></tr>${masConsumo}</table>
+ <div style="margin-top:12px;background:#fee2e2;border:1px solid #fca5a5;border-radius:5px;padding:8px 10px;font-size:12.5px;color:#7f1d1d"><b>Alerta activa:</b> CPU sobre 85 % durante 2 min. Proceso principal: chrome.exe (PID 4120).<br><span style="text-decoration:underline">Ver en Alertas</span></div></div>
+</div>`;}
+if(p=='procesos'){B.innerHTML=`
+<div class="tools"><span>Buscar:</span><div class="inp">nombre o PID</div><span style="margin-left:12px">Ordenar por:</span><div class="inp" style="width:130px">CPU % ▾</div><span style="margin-left:auto;color:var(--mut)">142 procesos · 2.318 hilos</span></div>
+<div class="card" style="padding:0"><table><tr><th>PID</th><th>Nombre</th><th>Estado</th><th>Prioridad</th><th class="num">CPU %</th><th class="num">Memoria (MB)</th><th class="num">Hilos</th></tr>
+${procs.map((r,i)=>`<tr class="${i==0?'sel':''}"><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td class="num">${r[4]}</td><td class="num">${r[5]}</td><td class="num">${r[6]}</td></tr>`).join('')}
+</table></div>
+<div style="margin-top:12px"><span class="btn">Actualizar</span><span class="btn">Cambiar prioridad…</span><span class="btn d">Finalizar proceso…</span></div>
+<div style="font-size:12px;color:var(--mut);margin-top:8px">Las acciones sobre procesos piden confirmación y quedan registradas en la tabla <i>accion</i>.</div>`;
+document.querySelector('.win').insertAdjacentHTML('beforeend',`<div class="modal-bg"></div><div class="modal"><div class="mt">Confirmar acción</div><div class="mb"><div class="warn">!</div><div><b>¿Finalizar chrome.exe (PID 4120)?</b><br>El proceso usa 52,4 % de CPU y 1,8 GB de RAM. Se perderá el trabajo que no se haya guardado en esa aplicación.</div></div><div class="mf"><span class="btn">Cancelar</span><span class="btn d" style="margin-right:0">Finalizar</span></div></div>`);}
+if(p=='alertas'){B.innerHTML=`
+<div class="tools"><span>Mostrar:</span><div class="inp" style="width:150px">Activas ▾</div><span style="margin-left:auto;color:var(--mut)">2 activas · 5 atendidas hoy</span></div>
+<div class="al"><div><span class="tag t-bad">ALTA</span><div class="r">09:40:12</div></div><div><b>Pico de CPU</b>umbral CPU 85 %</div><div>La CPU se mantiene en 87 % desde hace 2 min. Proceso principal: <b style="display:inline">chrome.exe</b> (PID 4120, 52,4 %).<div class="r">Recomendación: cierre pestañas que no use o finalice el proceso desde Procesos.</div></div><div><span class="btn p">Ir al proceso</span><span class="btn">Atendida</span></div></div>
+<div class="al m"><div><span class="tag t-warn">MEDIA</span><div class="r">09:31:47</div></div><div><b>Posible fuga de memoria</b>análisis del historial</div><div>python.exe (PID 2264) pasó de 210 a 612 MB en 15 min sin liberar memoria.<div class="r">Recomendación: revise el programa en ejecución; si no lo necesita, ciérrelo.</div></div><div><span class="btn p">Ir al proceso</span><span class="btn">Descartar</span></div></div>
+<div class="al l" style="opacity:.7"><div><span class="tag" style="background:#e2e8f0;color:#334155">ATENDIDA</span><div class="r">08:12:05</div></div><div><b>Disco casi lleno</b>umbral disco 90 %</div><div>La unidad C:\\ llegó a 91 %. Acción registrada: limpieza manual por el usuario.<div class="r">Recomendación: libere espacio o mueva archivos a otra unidad.</div></div><div></div></div>
+<div class="card" style="margin-top:6px;font-size:12.5px;color:var(--mut)"><b style="color:var(--fg)">Cómo se detecta:</b> una alerta ALTA aparece cuando un recurso supera su umbral durante el tiempo configurado. Una alerta MEDIA aparece cuando el valor actual se aleja más de tres desviaciones estándar del promedio móvil del historial, o cuando la memoria de un proceso crece sin bajar.</div>`;}
+</script></body></html>
