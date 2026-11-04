@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+<defs><marker id="a" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="#333"/></marker></defs>
+<rect width="1600" height="900" fill="white"/>
+<ellipse cx="800" cy="42" rx="120" ry="26" fill="#e3eefb" stroke="#1b2a5a" stroke-width="2"/><text x="800" y="49" text-anchor="middle" font-family="Liberation Sans, Arial" font-size="18" font-weight="700">Usuario del equipo</text>
+<rect x="30" y="92" width="1540" height="170" rx="14" fill="#eef4fd" stroke="#8db2e8" stroke-width="2"/>
+<text x="48" y="122" font-family="Liberation Sans, Arial" font-size="21" font-weight="700" fill="#1b2a5a">Capa de presentación · Tkinter y Matplotlib</text>
+<rect x="60" y="140" width="260" height="90" rx="9" fill="white" stroke="#1b2a5a" stroke-width="2"/>
+<text x="190.0" y="180.0" text-anchor="middle" font-family="Liberation Sans, Arial" font-size="18" font-weight="700" fill="#1d2433">Procesos</text>
+<text x="190.0" y="202.0" text-anchor="middle" font-family="Liberation Sans, Arial" font-size="15" font-weight="400" fill="#1d2433">lista y acciones</text>
+<rect x="350" y="140" width="260" height="90" rx="9" fill="white" stroke="#1b2a5a" stroke-width="2"/>
+<text x="480.0" y="180.0" text-anchor="middle" font-family="Liberation Sans, Arial" font-size="18" font-weight="700" fill="#1d2433">Panel en vivo</text>
+<text x="480.0" y="202.0" text-anchor="middle" font-family="Liberation Sans, Arial" font-size="15" font-weight="400" fill="#1d2433">CPU, RAM, disco, red</text>
+<rect x="640" y="140" width="260" height="90" rx="9" fill="white" stroke="#1b2a5a" stroke-width="2"/>
+<text x="770.0" y="180.0" text-anchor="middle" font-family="Liberation Sans, Arial" font-size="18" font-weight="700" fill="#1d2433">Configuración</text>
+<text x="770.0" y="202.0" text-anchor="middle" font-family="Liberation Sans, Arial" font-size="15" font-weight="400" fill="#1d2433">umbrales por recurso</text>
+<rect x="930" y="140" width="260" height="90" rx="9" fill="white" stroke="#1b2a5a" stroke-width="2"/>
+<text x="1060.0" y="180.0" text-anchor="middle" font-family="Liberation Sans, Arial" font-size="18" font-weight="700" fill="#1d2433">Historial e informe</text>
+<text x="1060.0" y="202.0" text-anchor="middle" font-family="Liberation Sans, Arial" font-size="15" font-weight="400" fill="#1d2433">gráficas de tendencia</text>
+<rect x="1250" y="140" width="260" height="90" rx="9" fill="white" stroke="#1b2a5a" stroke-width="2"/>
+<text x="1380.0" y="180.0" text-anchor="middle" font-family="Liberation Sans, Arial" font-size="18" font-weight="700" fill="#1d2433">Alertas</text>
+<text x="1380.0" y="202.0" text-anchor="middle" font-family="Liberation Sans, Arial" font-size="15" font-weight="400" fill="#1d2433">eventos y sugerencias</text>
+<polyline points="800,68 800,92" fill="none" stroke="#333" stroke-width="2"  marker-end="url(#a)" />
+<rect x="30" y="300" width="1540" height="200" rx="14" fill="#fff6e0" stroke="#e1b43b" stroke-width="2"/>
+<text x="48" y="330" font-family="Liberation Sans, Arial" font-size="21" font-weight="700" fill="#1b2a5a">Capa de lógica · Python</text>
+<rect x="60" y="350" width="260" height="110" rx="9" fill="white" stroke="#1b2a5a" stroke-width="2"/>
+<text x="190.0" y="400.0" text-anchor="middle" font-family="Liberation Sans, Arial" font-size="18" font-weight="700" fill="#1d2433">Gestor de procesos</text>
+<text x="190.0" y="422.0" text-anchor="middle" font-family="Liberation Sans, Arial" font-size="15" font-weight="400" fill="#1d2433">prioridad y finalizar</text>
+<rect x="350" y="350" width="260" height="110" rx="9" fill="white" stroke="#1b2a5a" stroke-width="2"/>
+<text x="480.0" y="400.0" text-anchor="middle" font-family="Liberation Sans, Arial" font-size="18" font-weight="700" fill="#1d2433">Planificador</text>
+<text x="480.0" y="422.0" text-anchor="middle" font-family="Liberation Sans, Arial" font-size="15" font-weight="400" fill="#1d2433">hilo en segundo plano</text>
+<rect x="640" y="350" width="260" height="110" rx="9" fill="white" stroke="#1b2a5a" stroke-width="2"/>
+<text x="770.0" y="400.0" text-anchor="middle" font-family="Liberation Sans, Arial" font-size="18" font-weight="700" fill="#1d2433">Recolector</text>
+<text x="770.0" y="422.0" text-anchor="middle" font-family="Liberation Sans, Arial" font-size="15" font-weight="400" fill="#1d2433">recolector.py</text>
+<rect x="930" y="350" width="260" height="110" rx="9" fill="white" stroke="#1b2a5a" stroke-width="2"/>
+<text x="1060.0" y="389.0" text-anchor="middle" font-family="Liberation Sans, Arial" font-size="18" font-weight="700" fill="#1d2433">Motor de análisis</text>
+<text x="1060.0" y="411.0" text-anchor="middle" font-family="Liberation Sans, Arial" font-size="15" font-weight="400" fill="#1d2433">umbral, promedio móvil,</text>
+<text x="1060.0" y="433.0" text-anchor="middle" font-family="Liberation Sans, Arial" font-size="15" font-weight="400" fill="#1d2433">desviación estándar</text>
+<rect x="1250" y="350" width="260" height="110" rx="9" fill="white" stroke="#1b2a5a" stroke-width="2"/>
+<text x="1380.0" y="400.0" text-anchor="middle" font-family="Liberation Sans, Arial" font-size="18" font-weight="700" fill="#1d2433">Módulo de alertas</text>
+<text x="1380.0" y="422.0" text-anchor="middle" font-family="Liberation Sans, Arial" font-size="15" font-weight="400" fill="#1d2433">mensaje y recomendación</text>
+<polyline points="610,405 640,405" fill="none" stroke="#333" stroke-width="2"  marker-end="url(#a)" />
+<polyline points="900,405 930,405" fill="none" stroke="#333" stroke-width="2"  marker-end="url(#a)" />
+<polyline points="1190,405 1250,405" fill="none" stroke="#333" stroke-width="2"  marker-end="url(#a)" />
+<text x="905" y="395" font-family="Liberation Sans, Arial" font-size="13" fill="#444" font-style="italic"></text>
+<text x="1188" y="390" font-family="Liberation Sans, Arial" font-size="13" fill="#444" font-style="italic">anomalía</text>
+<polyline points="190,230 190,350" fill="none" stroke="#333" stroke-width="2"  marker-end="url(#a)" />
+<text x="200" y="286" font-family="Liberation Sans, Arial" font-size="14" fill="#444" font-style="italic">acción confirmada</text>
+<polyline points="480,350 480,230" fill="none" stroke="#333" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#a)" />
+<text x="490" y="286" font-family="Liberation Sans, Arial" font-size="14" fill="#444" font-style="italic">refresca cada 1 a 2 s</text>
+<polyline points="1380,350 1380,230" fill="none" stroke="#333" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#a)" />
+<text x="1390" y="286" font-family="Liberation Sans, Arial" font-size="14" fill="#444" font-style="italic">notifica</text>
+<rect x="30" y="540" width="820" height="330" rx="14" fill="#fbe5e7" stroke="#e58b93" stroke-width="2"/>
+<text x="48" y="570" font-family="Liberation Sans, Arial" font-size="21" font-weight="700" fill="#1b2a5a">Sistema operativo · Windows 10/11 (compatible con Linux)</text>
+<rect x="60" y="600" width="760" height="80" rx="9" fill="#fff" stroke="#1b2a5a" stroke-width="2"/>
+<text x="440.0" y="635.0" text-anchor="middle" font-family="Liberation Sans, Arial" font-size="18" font-weight="700" fill="#1d2433">psutil</text>
+<text x="440.0" y="657.0" text-anchor="middle" font-family="Liberation Sans, Arial" font-size="15" font-weight="400" fill="#1d2433">biblioteca multiplataforma de consulta del sistema</text>
+<rect x="60" y="740" width="760" height="100" rx="9" fill="#fff" stroke="#1b2a5a" stroke-width="2"/>
+<text x="440.0" y="774.0" text-anchor="middle" font-family="Liberation Sans, Arial" font-size="18" font-weight="700" fill="#1d2433">Núcleo del sistema operativo</text>
+<text x="440.0" y="796.0" text-anchor="middle" font-family="Liberation Sans, Arial" font-size="15" font-weight="400" fill="#1d2433">tabla de procesos, memoria, sistema de archivos, red</text>
+<text x="440.0" y="818.0" text-anchor="middle" font-family="Liberation Sans, Arial" font-size="15" font-weight="400" fill="#1d2433">API de Win32 en Windows; /proc y /sys en Linux</text>
+<polyline points="440,680 440,740" fill="none" stroke="#333" stroke-width="2"  marker-end="url(#a)" marker-start="url(#a)"/>
+<rect x="890" y="540" width="680" height="330" rx="14" fill="#eaf7ee" stroke="#7cc495" stroke-width="2"/>
+<text x="908" y="570" font-family="Liberation Sans, Arial" font-size="21" font-weight="700" fill="#1b2a5a">Capa de datos</text>
+<rect x="920" y="640" width="280" height="110" rx="9" fill="white" stroke="#1b2a5a" stroke-width="2"/>
+<text x="1060.0" y="679.0" text-anchor="middle" font-family="Liberation Sans, Arial" font-size="18" font-weight="700" fill="#1d2433">Almacenamiento</text>
+<text x="1060.0" y="701.0" text-anchor="middle" font-family="Liberation Sans, Arial" font-size="15" font-weight="400" fill="#1d2433">almacenamiento.py</text>
+<text x="1060.0" y="723.0" text-anchor="middle" font-family="Liberation Sans, Arial" font-size="15" font-weight="400" fill="#1d2433">sqlite3</text>
+<path d="M1280,640 L1280,750 A120,22 0 0,0 1520,750 L1520,640 " fill="#d7f0df" stroke="#1b2a5a" stroke-width="2"/><ellipse cx="1400" cy="640" rx="120" ry="22" fill="#e9f8ee" stroke="#1b2a5a" stroke-width="2"/>
+<text x="1400" y="702" text-anchor="middle" font-family="Liberation Sans, Arial" font-size="18" font-weight="700">mirs.db</text><text x="1400" y="726" text-anchor="middle" font-family="Liberation Sans, Arial" font-size="15">SQLite · 6 tablas</text>
+<polyline points="1200,695 1280,695" fill="none" stroke="#333" stroke-width="2"  marker-end="url(#a)" marker-start="url(#a)"/>
+<polyline points="190,460 190,600" fill="none" stroke="#333" stroke-width="2"  marker-end="url(#a)" />
+<text x="200" y="530" font-family="Liberation Sans, Arial" font-size="14" fill="#444" font-style="italic">cambia prioridad o finaliza</text>
+<polyline points="770,460 770,600" fill="none" stroke="#333" stroke-width="2"  marker-end="url(#a)" />
+<text x="672" y="530" font-family="Liberation Sans, Arial" font-size="14" fill="#444" font-style="italic">lee métricas</text>
+<polyline points="850,460 850,520 1010,520 1010,640" fill="none" stroke="#333" stroke-width="2"  marker-end="url(#a)" />
+<text x="860" y="514" font-family="Liberation Sans, Arial" font-size="14" fill="#444" font-style="italic">guarda muestras</text>
+<polyline points="1380,460 1380,520 1150,520 1150,640" fill="none" stroke="#333" stroke-width="2"  marker-end="url(#a)" />
+<text x="1220" y="512" font-family="Liberation Sans, Arial" font-size="14" fill="#444" font-style="italic">guarda alertas</text>
+<polyline points="320,460 320,482 1090,482 1090,640" fill="none" stroke="#333" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#a)" />
+<text x="330" y="477" font-family="Liberation Sans, Arial" font-size="14" fill="#444" font-style="italic">registra la acción</text>
+</svg>
