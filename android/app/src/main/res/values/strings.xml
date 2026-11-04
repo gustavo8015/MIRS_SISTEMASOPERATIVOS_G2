@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MIRS Móvil</string>
+    <string name="nav_panel">Panel</string>
+    <string name="nav_procesos">Procesos</string>
+    <string name="nav_alertas">Alertas</string>
+    <string name="menu_servidor">Servidor</string>
+    <string name="conectando">Conectando con el PC…</string>
+    <string name="sin_conexion">Sin conexión con %1$s. Verifique que el servidor de MIRS esté corriendo.</string>
+    <string name="conectado">Conectado · última muestra %1$s</string>
+    <string name="cpu">CPU</string>
+    <string name="ram">Memoria RAM</string>
+    <string name="disco">Disco</string>
+    <string name="red">Red</string>
+    <string name="uso_reciente">Uso reciente</string>
+    <string name="mayor_consumo">Mayor consumo</string>
+    <string name="buscar_proceso">Buscar por nombre o PID</string>
+    <string name="solo_lectura">Lista de solo lectura. Para finalizar o cambiar la prioridad de un proceso use la aplicación del PC.</string>
+    <string name="activas">Activas</string>
+    <string name="todas">Todas</string>
+    <string name="sin_alertas">No hay alertas para mostrar.</string>
+    <string name="atendida">Atendida</string>
+    <string name="descartar">Descartar</string>
+    <string name="servidor_titulo">Dirección del servidor</string>
+    <string name="servidor_ayuda">Emulador de Android Studio: http://10.0.2.2:8765\nCelular en la misma WiFi: http://IP-del-PC:8765 (inicie el servidor con --lan)</string>
+    <string name="guardar">Guardar</string>
+    <string name="cancelar">Cancelar</string>
+    <string name="alerta_actualizada">Alerta marcada como %1$s</string>
+    <string name="error_accion">No se pudo actualizar la alerta</string>
+</resources>

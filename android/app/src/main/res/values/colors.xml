@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primario">#1E40AF</color>
+    <color name="primario_oscuro">#1B2A5A</color>
+    <color name="acento">#D97706</color>
+    <color name="peligro">#DC2626</color>
+    <color name="exito">#15803D</color>
+    <color name="fondo">#F8FAFC</color>
+    <color name="tarjeta">#FFFFFF</color>
+    <color name="borde">#CBD5E1</color>
+    <color name="texto">#1E293B</color>
+    <color name="texto_suave">#475569</color>
+    <color name="pista">#E2E8F0</color>
+    <color name="fondo_peligro">#FEE2E2</color>
+    <color name="fondo_aviso">#FEF3C7</color>
+    <color name="fondo_exito">#DCFCE7</color>
+    <color name="texto_peligro">#991B1B</color>
+    <color name="texto_aviso">#92400E</color>
+</resources>
