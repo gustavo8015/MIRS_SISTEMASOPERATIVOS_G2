@@ -100,7 +100,9 @@ public class MainActivity extends AppCompatActivity {
         vistaPanel = findViewById(R.id.vista_panel);
         vistaProcesos = findViewById(R.id.vista_procesos);
         vistaAlertas = findViewById(R.id.vista_alertas);
-        refrescar = findViewById(R.id.refrescar_panel);
+        // El <include> de activity_main le da a la raíz de vista_panel el id vista_panel,
+        // así que el SwipeRefreshLayout se busca con ese id (refrescar_panel deja de existir).
+        refrescar = findViewById(R.id.vista_panel);
         grafica = findViewById(R.id.grafica);
         leyenda = findViewById(R.id.leyenda);
         banner = findViewById(R.id.banner_alerta);
