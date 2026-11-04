@@ -111,7 +111,7 @@ MIRS_SISTEMASOPERATIVOS_G2/
 │   ├── ficha/             ficha técnica (Entrega 1)
 │   ├── diagramas/         arquitectura y modelo relacional (fuente y PNG)
 │   ├── mockups/           pantallas propuestas de la interfaz (HTML y PNG)
-│   └── Entrega2_*.docx    documento de la Entrega 2
+│   └── Entrega2_*.docx/pdf documento de la Entrega 2
 ├── requirements.txt
 └── README.md
 ```
@@ -157,4 +157,4 @@ Los mensajes siguen [Conventional Commits](https://www.conventionalcommits.org/e
 
 - [Ficha técnica (Entrega 1)](docs/ficha/Entrega1_Microproyecto_MIRS.png)
 - [Mockups de la interfaz](docs/mockups/)
-- [Documento de la Entrega 2](docs/)
+- Documento de la Entrega 2: [Word](docs/Entrega2_Estructura_Prototipo_MIRS.docx) · [PDF](docs/Entrega2_Estructura_Prototipo_MIRS.pdf)
