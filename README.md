@@ -1,15 +1,15 @@
 # MIRS: Monitor Inteligente de Recursos del Sistema
 
-Aplicación de escritorio que vigila en tiempo real el uso de CPU, memoria, disco y red de un equipo con Windows, identifica los procesos que más recursos consumen, detecta comportamientos anómalos comparando el consumo actual con el historial y avisa al usuario con alertas y recomendaciones.
+Aplicación de escritorio que vigila en tiempo real el uso de CPU, memoria, disco y red de un equipo con Windows, identifica los procesos que más recursos consumen, detecta comportamientos anómalos comparando el consumo actual con el historial y avisa al usuario con alertas y recomendaciones. Incluye **MIRS Móvil**, una app Android que muestra en el celular el estado del PC y sus alertas.
 
 Proyecto de aula (ABP) de la asignatura **Sistemas Operativos**, Ingeniería de Software, Universidad Manuela Beltrán, Bogotá, 2026. Grupo 2.
 
 | | |
 |---|---|
 | Autores | Gustavo Adolfo Cardona Bayona · Jonathan Soler Guevara · Sebastián Torrez Florez |
-| Lenguaje | Python 3.10 o superior |
-| Plataforma | Windows 10/11 (el núcleo de lectura también funciona en Linux) |
-| Estado | Entrega 2: estructura del prototipo, versión 0.1.0 |
+| Lenguaje | Python 3.10 o superior (PC) y Java (app Android) |
+| Plataforma | Windows 10/11 (el núcleo de lectura también funciona en Linux); app para Android 8.0 o superior |
+| Estado | Versión 0.2.0: monitoreo continuo, alertas, API y app móvil |
 
 ## Contexto
 
@@ -29,9 +29,9 @@ MIRS responde a esa situación con tres ideas: **monitorear** de forma continua,
 
 ### Alcance
 
-**Incluye:** monitoreo de un solo equipo local; visualización en tiempo real; detección por umbrales y por análisis estadístico simple; alertas, recomendaciones y acciones básicas con confirmación; historial e informe; pruebas y manual de usuario.
+**Incluye:** monitoreo de un solo equipo local; visualización en tiempo real; detección por umbrales y por análisis estadístico simple; alertas, recomendaciones y acciones básicas con confirmación; historial e informe; una app Android de consulta que muestra el panel, los procesos y las alertas del PC; pruebas y manual de usuario.
 
-**No incluye:** monitoreo remoto de varios equipos, modelos de aprendizaje automático entrenados, modificación del núcleo o de controladores, funciones de antivirus y versiones web o móviles.
+**No incluye:** monitoreo remoto de varios equipos, modelos de aprendizaje automático entrenados, modificación del núcleo o de controladores, funciones de antivirus, acciones sobre procesos desde el celular, monitoreo del propio celular ni versión web.
 
 ## Cómo detecta las anomalías
 
@@ -56,13 +56,46 @@ La aplicación se organiza en tres capas sobre el sistema operativo. La interfaz
 | Recolector de métricas | `src/mirs/recolector.py` | Implementado |
 | Almacenamiento | `src/mirs/almacenamiento.py` | Implementado |
 | Configuración | `src/mirs/config.py` | Implementado |
-| Planificador de muestreo | `src/mirs/planificador.py` | Siguiente entrega |
-| Motor de análisis | `src/mirs/analizador.py` | Siguiente entrega |
-| Módulo de alertas | `src/mirs/alertas.py` | Siguiente entrega |
+| Planificador de muestreo | `src/mirs/planificador.py` | Implementado |
+| Motor de análisis y alertas | `src/mirs/analizador.py` | Implementado (las tres reglas) |
+| Servidor y API para la app | `src/mirs/servidor.py` | Implementado |
+| App móvil (MIRS Móvil) | `android/` | Implementada |
 | Gestor de procesos | `src/mirs/gestor_procesos.py` | Siguiente entrega |
 | Interfaz gráfica | `src/mirs/interfaz/` | Siguiente entrega (mockups en `docs/mockups`) |
 
 El recolector usa **psutil**, que obtiene los datos del núcleo a través de la API de Win32 en Windows y de `/proc` y `/sys` en Linux. El uso de CPU de cada proceso se calcula entre dos lecturas y se divide por el número de núcleos para que quede entre 0 y 100 %.
+
+## App móvil: MIRS Móvil
+
+App Android escrita en Java que muestra en el celular lo que pasa en el PC. No lee el celular: consulta cada 2 segundos la API que publica el servidor de MIRS en el PC.
+
+```
+Celular / emulador  --HTTP-->  servidor.py (PC)  -->  mirs.db (SQLite)
+   MIRS Móvil                 hilo de muestreo + API      historial y alertas
+```
+
+| Pestaña | Qué muestra |
+|---|---|
+| Panel | CPU, RAM, disco y red con su estado (Normal, Vigilar, Alerta), gráfica de los últimos 5 minutos con la línea del umbral, alerta activa y procesos de mayor consumo |
+| Procesos | Procesos de la última muestra con PID, estado, prioridad, hilos, CPU y memoria; búsqueda por nombre o PID |
+| Alertas | Alertas activas o todas, con severidad, mensaje y recomendación; botones para marcarlas como atendidas o descartarlas |
+
+La app es de consulta: no finaliza procesos ni cambia prioridades, porque esas acciones requieren confirmación frente al equipo. La única escritura es el estado de una alerta.
+
+Al igual que la interfaz del PC, la app separa la red de la pantalla: las consultas corren en un hilo aparte (`ExecutorService`) y los resultados se pintan en el hilo principal (`Handler`). La gráfica se dibuja con `Canvas`, sin librerías externas.
+
+### API del servidor
+
+| Método y ruta | Respuesta |
+|---|---|
+| `GET /api/estado` | Equipo, última muestra, 5 procesos de mayor consumo y número de alertas activas |
+| `GET /api/muestras?cantidad=150` | Historial reciente en orden cronológico |
+| `GET /api/procesos` | Procesos de la última muestra |
+| `GET /api/alertas?estado=ACTIVA` | Alertas activas (`estado=TODAS` para todas) |
+| `GET /api/umbrales` | Umbrales configurados |
+| `POST /api/alertas/<id>` | Cuerpo `{"estado": "ATENDIDA"}` o `{"estado": "DESCARTADA"}` |
+
+El servidor usa solo la biblioteca estándar de Python (`http.server`). No tiene autenticación: por defecto escucha únicamente en el propio PC (127.0.0.1), que es lo que necesita el emulador; la opción `--lan` lo abre a la red WiFi para un celular físico.
 
 ## Base de datos
 
@@ -91,6 +124,8 @@ Las reglas de integridad se aplican en la propia base de datos: llaves foráneas
 | Matplotlib | Gráficas de tendencia dentro de la interfaz |
 | SQLite 3 (`sqlite3`) | Historial local, sin servidor |
 | threading | Hilo de muestreo en segundo plano |
+| http.server | API JSON para la app móvil, sin dependencias externas |
+| Android (Java), AndroidX y Material Components | App móvil, compilada con Android Studio (Gradle 8.7, AGP 8.5.2, minSdk 26) |
 | unittest | Pruebas automáticas |
 | Git y GitHub | Control de versiones |
 | Visual Studio Code | Entorno de desarrollo |
@@ -103,7 +138,11 @@ MIRS_SISTEMASOPERATIVOS_G2/
 │   ├── __main__.py        prueba de consola: toma muestras y las guarda
 │   ├── config.py          intervalo, ruta de la base de datos y umbrales iniciales
 │   ├── recolector.py      lectura del sistema con psutil
-│   └── almacenamiento.py  acceso a SQLite
+│   ├── almacenamiento.py  acceso a SQLite
+│   ├── analizador.py      reglas de detección de anomalías
+│   ├── planificador.py    hilo de muestreo en segundo plano
+│   └── servidor.py        monitoreo continuo y API para la app móvil
+├── android/               app MIRS Móvil (proyecto de Android Studio)
 ├── database/schema.sql    esquema de las seis tablas
 ├── tests/                 pruebas unitarias
 ├── datos/                 aquí se crea mirs.db (no se versiona)
@@ -131,13 +170,29 @@ python -m mirs --muestras 5          # toma 5 muestras, las imprime y las guarda
 
 Opciones: `--intervalo 2` (segundos entre muestras) y `--bd ruta\archivo.db`. Algunos procesos del sistema pertenecen a otro usuario; psutil no puede leerlos sin permisos de administrador y el recolector los omite sin detenerse.
 
+### Servidor y app móvil
+
+1. **Inicie el servidor en el PC** y deje la ventana abierta:
+
+   ```powershell
+   $env:PYTHONPATH = "src"
+   python -m mirs.servidor              # monitorea cada 2 s y publica la API en el puerto 8765
+   ```
+
+   Debe mostrar `API en http://127.0.0.1:8765/api/estado`. Puede comprobarlo abriendo esa dirección en el navegador.
+2. **Abra la app en Android Studio:** File, Open y elija la carpeta `android`. Espere a que termine la sincronización de Gradle (la primera vez descarga Gradle 8.7 y las dependencias). Si pregunta por el Gradle JDK, use el JDK 17 incluido.
+3. **Ejecute la app** en el emulador con el botón Run. La app usa por defecto `http://10.0.2.2:8765`, la dirección con la que el emulador llega al PC.
+4. **Celular físico** en la misma red WiFi: inicie el servidor con `python -m mirs.servidor --lan`, consulte la IP del PC con `ipconfig` y, en la app, toque el ícono de servidor de la barra superior y escriba `http://IP-del-PC:8765`. Windows puede pedir permiso en el firewall para Python.
+
+Para ver una alerta en la demostración, baje temporalmente el umbral de CPU en la tabla `umbral` (por ejemplo a 30 % y 10 s) o ponga el equipo bajo carga.
+
 ## Pruebas
 
 ```powershell
 python -m unittest discover -s tests -v
 ```
 
-Diez pruebas cubren el recolector (rangos válidos de CPU, RAM y disco, orden y límite de la lista de procesos) y el almacenamiento (creación de las seis tablas, equipo sin duplicados, un umbral por recurso, llave foránea, `CHECK` de porcentajes y transacción que no deja procesos huérfanos).
+Veintitrés pruebas cubren el recolector (rangos válidos, orden y límite de la lista de procesos, prioridad como entero), el almacenamiento (seis tablas, equipo sin duplicados, un umbral por recurso, llave foránea, `CHECK` de porcentajes y transacción sin procesos huérfanos), las reglas del analizador (umbral sostenido frente a pico corto, desviación del historial y posible fuga de memoria) y la API (estado, historial, umbrales, cambio de estado de una alerta y errores 400 y 404).
 
 ## Hoja de ruta
 
@@ -145,7 +200,7 @@ Diez pruebas cubren el recolector (rangos válidos de CPU, RAM y disco, orden y 
 |---|---|---|
 | 1 | Ficha técnica del proyecto | Entregada |
 | 2 | Levantamiento de información, descripción, estructura del prototipo y tecnologías | Esta versión |
-| 3 | Planificador de muestreo, motor de análisis y alertas | Pendiente |
+| 3 | Planificador de muestreo, motor de análisis, alertas, API y app móvil | En curso (implementados) |
 | 4 | Interfaz Tkinter completa, gestor de procesos e informe | Pendiente |
 | 5 | Pruebas finales, manual de usuario y sustentación | Pendiente |
 
