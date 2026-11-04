@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/fondo"
+    android:orientation="vertical">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/barra"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/primario"
+        app:subtitleTextColor="#DBEAFE"
+        app:title="@string/app_name"
+        app:titleTextColor="#FFFFFF" />
+
+    <TextView
+        android:id="@+id/estado_conexion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/tarjeta"
+        android:paddingStart="12dp"
+        android:paddingTop="6dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="6dp"
+        android:text="@string/conectando"
+        android:textColor="@color/texto_suave"
+        android:textSize="12sp" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <include
+            android:id="@+id/vista_panel"
+            layout="@layout/vista_panel" />
+
+        <include
+            android:id="@+id/vista_procesos"
+            layout="@layout/vista_procesos"
+            android:visibility="gone" />
+
+        <include
+            android:id="@+id/vista_alertas"
+            layout="@layout/vista_alertas"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/navegacion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/tarjeta"
+        app:menu="@menu/navegacion" />
+</LinearLayout>

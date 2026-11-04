@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/accion_servidor" android:icon="@drawable/ic_servidor"
+        android:title="@string/menu_servidor" app:showAsAction="ifRoom" />
+</menu>
