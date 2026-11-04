@@ -5,6 +5,14 @@
     <string name="nav_procesos">Procesos</string>
     <string name="nav_alertas">Alertas</string>
     <string name="menu_servidor">Servidor</string>
+    <string name="menu_buscar">Buscar equipos</string>
+    <string name="buscando">Buscando equipos con MIRS en la red…</string>
+    <string name="equipos_encontrados">Equipos encontrados</string>
+    <string name="ninguno_encontrado">No se encontraron equipos</string>
+    <string name="ayuda_busqueda">En el PC que quiere ver, abra MIRS_Servidor.exe (o python -m mirs.servidor --lan) y conecte el celular a la misma red WiFi. Si la red bloquea la búsqueda, escriba la dirección con el botón Servidor.</string>
+    <string name="escribir_direccion">Escribir dirección</string>
+    <string name="cerrar">Cerrar</string>
+    <string name="conectado_a">Conectado a %1$s</string>
     <string name="conectando">Conectando con el PC…</string>
     <string name="sin_conexion">Sin conexión con %1$s. Verifique que el servidor de MIRS esté corriendo.</string>
     <string name="conectado">Conectado · última muestra %1$s</string>
@@ -22,7 +30,7 @@
     <string name="atendida">Atendida</string>
     <string name="descartar">Descartar</string>
     <string name="servidor_titulo">Dirección del servidor</string>
-    <string name="servidor_ayuda">Emulador de Android Studio: http://10.0.2.2:8765\nCelular en la misma WiFi: http://IP-del-PC:8765 (inicie el servidor con --lan)</string>
+    <string name="servidor_ayuda">Emulador de Android Studio: http://10.0.2.2:8765\nOtro PC o celular en la misma WiFi: http://IP-del-PC:8765 (abra MIRS_Servidor.exe en ese PC)</string>
     <string name="guardar">Guardar</string>
     <string name="cancelar">Cancelar</string>
     <string name="alerta_actualizada">Alerta marcada como %1$s</string>
