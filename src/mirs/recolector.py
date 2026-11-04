@@ -75,7 +75,7 @@ def listar_procesos(top: int = 10, espera: float = 0.5) -> list[dict]:
                     "pid": p.pid,
                     "nombre": p.name() or f"pid-{p.pid}",
                     "estado": p.status(),
-                    "prioridad": p.nice(),
+                    "prioridad": int(p.nice()),  # en Windows psutil 8 devuelve un enum de clase de prioridad
                     "cpu_pct": round(p.cpu_percent(None) / nucleos, 1),
                     "memoria_mb": round(p.memory_info().rss / 1024**2, 1),
                     "hilos": p.num_threads(),

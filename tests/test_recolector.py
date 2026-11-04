@@ -32,6 +32,7 @@ class PruebasRecolector(unittest.TestCase):
         for p in procesos:
             self.assertGreaterEqual(p["pid"], 0)
             self.assertTrue(p["nombre"])
+            self.assertIs(type(p["prioridad"]), int)  # sqlite3 debe recibir un entero
 
 
 if __name__ == "__main__":
