@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,6 +34,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -91,6 +93,10 @@ public class MainActivity extends AppCompatActivity {
         barra.setOnMenuItemClickListener(item -> {
             if (item.getItemId() == R.id.accion_servidor) {
                 dialogoServidor();
+                return true;
+            }
+            if (item.getItemId() == R.id.accion_buscar) {
+                buscarEquipos();
                 return true;
             }
             return false;
@@ -362,6 +368,61 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /** Busca servidores en la red y deja elegir uno; así no hay que escribir la IP. */
+    private void buscarEquipos() {
+        ProgressBar progreso = new ProgressBar(this);
+        LinearLayout contenido = new LinearLayout(this);
+        int margen = Math.round(24 * getResources().getDisplayMetrics().density);
+        contenido.setPadding(margen, margen / 2, margen, 0);
+        contenido.addView(progreso, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+        androidx.appcompat.app.AlertDialog espera = new MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.buscando)
+                .setView(contenido)
+                .setCancelable(false)
+                .show();
+
+        // la búsqueda usa su propio hilo para no esperar detrás de la consulta periódica
+        new Thread(() -> {
+            List<DescubridorEquipos.Equipo> equipos = DescubridorEquipos.buscar(2000);
+            principal.post(() -> {
+                espera.dismiss();
+                if (isFinishing()) {
+                    return;
+                }
+                if (equipos.isEmpty()) {
+                    new MaterialAlertDialogBuilder(this)
+                            .setTitle(R.string.ninguno_encontrado)
+                            .setMessage(R.string.ayuda_busqueda)
+                            .setPositiveButton(R.string.escribir_direccion, (d, b) -> dialogoServidor())
+                            .setNegativeButton(R.string.cerrar, null)
+                            .show();
+                    return;
+                }
+                String[] etiquetas = new String[equipos.size()];
+                for (int i = 0; i < equipos.size(); i++) {
+                    etiquetas[i] = equipos.get(i).etiqueta();
+                }
+                new MaterialAlertDialogBuilder(this)
+                        .setTitle(R.string.equipos_encontrados)
+                        .setItems(etiquetas, (d, i) -> {
+                            DescubridorEquipos.Equipo elegido = equipos.get(i);
+                            usarServidor(elegido.url);
+                            Toast.makeText(this, getString(R.string.conectado_a, elegido.nombre),
+                                    Toast.LENGTH_SHORT).show();
+                        })
+                        .setNegativeButton(R.string.cancelar, null)
+                        .show();
+            });
+        }, "mirs-busqueda").start();
+    }
+
+    private void usarServidor(String url) {
+        getSharedPreferences(PREFERENCIAS, MODE_PRIVATE).edit().putString(CLAVE_SERVIDOR, url).apply();
+        api = new ApiCliente(url);
+        estadoConexion.setText(R.string.conectando);
+        actualizar();
+    }
+
     private void dialogoServidor() {
         EditText campo = new EditText(this);
         campo.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
@@ -380,11 +441,7 @@ public class MainActivity extends AppCompatActivity {
                     if (!url.startsWith("http://") && !url.startsWith("https://")) {
                         url = "http://" + url;
                     }
-                    getSharedPreferences(PREFERENCIAS, MODE_PRIVATE).edit()
-                            .putString(CLAVE_SERVIDOR, url).apply();
-                    api = new ApiCliente(url);
-                    estadoConexion.setText(R.string.conectando);
-                    actualizar();
+                    usarServidor(url);
                 })
                 .setNegativeButton(R.string.cancelar, null)
                 .show();
