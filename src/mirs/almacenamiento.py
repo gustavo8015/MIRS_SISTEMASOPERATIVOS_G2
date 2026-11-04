@@ -94,3 +94,73 @@ class Almacenamiento:
                    ORDER BY fecha_hora DESC, id_muestra DESC LIMIT ?""",
                 (id_equipo, cantidad),
             ).fetchall()
+
+    # ---------- consultas para el análisis, el planificador y la API ----------
+
+    def equipo(self, id_equipo: int) -> dict | None:
+        with self.sesion() as c:
+            fila = c.execute("SELECT * FROM equipo WHERE id_equipo = ?", (id_equipo,)).fetchone()
+            return dict(fila) if fila else None
+
+    def umbrales(self, id_equipo: int) -> list[dict]:
+        with self.sesion() as c:
+            return [dict(f) for f in c.execute(
+                "SELECT * FROM umbral WHERE id_equipo = ? AND activo = 1 ORDER BY recurso", (id_equipo,))]
+
+    def muestras(self, id_equipo: int, cantidad: int = 150) -> list[dict]:
+        """Las últimas `cantidad` muestras en orden cronológico (de la más antigua a la más reciente)."""
+        filas = self.ultimas_muestras(id_equipo, cantidad)
+        return [dict(f) for f in reversed(filas)]
+
+    def procesos_de_muestra(self, id_muestra: int) -> list[dict]:
+        with self.sesion() as c:
+            return [dict(f) for f in c.execute(
+                """SELECT pid, nombre, estado, prioridad, cpu_pct, memoria_mb, hilos
+                   FROM proceso_muestra WHERE id_muestra = ?
+                   ORDER BY cpu_pct DESC, memoria_mb DESC""", (id_muestra,))]
+
+    def historial_proceso(self, id_equipo: int, pid: int, nombre: str, cantidad: int) -> list[float]:
+        """Memoria (MB) del mismo proceso en sus últimas apariciones, en orden cronológico."""
+        with self.sesion() as c:
+            filas = c.execute(
+                """SELECT pm.memoria_mb FROM proceso_muestra pm
+                   JOIN muestra m ON m.id_muestra = pm.id_muestra
+                   WHERE m.id_equipo = ? AND pm.pid = ? AND pm.nombre = ?
+                   ORDER BY m.fecha_hora DESC, m.id_muestra DESC LIMIT ?""",
+                (id_equipo, pid, nombre, cantidad)).fetchall()
+        return [f[0] for f in reversed(filas)]
+
+    def alertas(self, id_equipo: int, solo_activas: bool = False, cantidad: int = 50) -> list[dict]:
+        consulta = """SELECT a.*, m.fecha_hora FROM alerta a
+                      JOIN muestra m ON m.id_muestra = a.id_muestra
+                      WHERE m.id_equipo = ?"""
+        if solo_activas:
+            consulta += " AND a.estado = 'ACTIVA'"
+        consulta += " ORDER BY a.id_alerta DESC LIMIT ?"
+        with self.sesion() as c:
+            return [dict(f) for f in c.execute(consulta, (id_equipo, cantidad))]
+
+    def hay_alerta_activa(self, id_equipo: int, tipo: str, severidad: str, pid: int | None = None) -> bool:
+        consulta = """SELECT 1 FROM alerta a JOIN muestra m ON m.id_muestra = a.id_muestra
+                      WHERE m.id_equipo = ? AND a.tipo = ? AND a.severidad = ? AND a.estado = 'ACTIVA'"""
+        args = [id_equipo, tipo, severidad]
+        if pid is not None:
+            consulta += " AND a.pid = ?"
+            args.append(pid)
+        with self.sesion() as c:
+            return c.execute(consulta + " LIMIT 1", args).fetchone() is not None
+
+    def guardar_alerta(self, alerta: dict) -> int:
+        datos = {"id_umbral": None, "pid": None, "nombre_proceso": None, "recomendacion": None, **alerta}
+        with self.sesion() as c:
+            return c.execute(
+                """INSERT INTO alerta (id_muestra, id_umbral, tipo, severidad, pid, nombre_proceso,
+                                       mensaje, recomendacion)
+                   VALUES (:id_muestra, :id_umbral, :tipo, :severidad, :pid, :nombre_proceso,
+                           :mensaje, :recomendacion)""", datos).lastrowid
+
+    def cambiar_estado_alerta(self, id_alerta: int, estado: str) -> bool:
+        with self.sesion() as c:
+            return c.execute("UPDATE alerta SET estado = ? WHERE id_alerta = ?",
+                             (estado, id_alerta)).rowcount == 1
+
