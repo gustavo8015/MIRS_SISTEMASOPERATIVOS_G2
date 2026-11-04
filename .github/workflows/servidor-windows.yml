@@ -1,0 +1,63 @@
+# Construye MIRS_Servidor.exe en una máquina Windows de GitHub.
+# - En cada push a main que cambie el servidor: compila, prueba y deja el .exe como artefacto.
+# - Al crear una etiqueta vX.Y.Z: además lo publica en Releases para descargarlo sin iniciar sesión.
+name: Servidor Windows (.exe)
+
+on:
+  push:
+    branches: [main]
+    paths: ["src/**", "database/**", "mirs_servidor.py", "tests/**", ".github/workflows/servidor-windows.yml"]
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  exe:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependencias
+        run: pip install psutil pyinstaller
+
+      - name: Pruebas unitarias
+        run: python -m unittest discover -s tests -v
+
+      - name: Empaquetar con PyInstaller
+        run: >
+          pyinstaller --onefile --name MIRS_Servidor --paths src
+          --add-data "database/schema.sql;database" --collect-submodules mirs
+          --noconfirm mirs_servidor.py
+
+      - name: Prueba de humo del .exe
+        shell: pwsh
+        run: |
+          $p = Start-Process -FilePath dist\MIRS_Servidor.exe -ArgumentList "--solo-local","--puerto","8799" -PassThru
+          Start-Sleep -Seconds 10
+          $r = Invoke-RestMethod http://127.0.0.1:8799/api/estado
+          Write-Host "Equipo: $($r.equipo.nombre_host) - CPU $($r.muestra.cpu_pct) %"
+          Stop-Process -Id $p.Id
+          if (-not $r.muestra) { throw "El .exe no devolvió muestras" }
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MIRS_Servidor
+          path: dist/MIRS_Servidor.exe
+
+      - name: Publicar en Releases
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/MIRS_Servidor.exe
+          body: |
+            Servidor de MIRS para Windows 10/11. No requiere instalar Python.
+            1. Descargue MIRS_Servidor.exe y ábralo con doble clic.
+            2. Si Windows muestra "Windows protegió su PC", elija "Más información" y "Ejecutar de todas formas".
+            3. Si el firewall pregunta, permita el acceso en redes privadas.
+            4. En la app MIRS Móvil use "Buscar equipos" (mismo WiFi) o escriba http://IP-del-PC:8765.
