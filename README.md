@@ -6,7 +6,7 @@ Proyecto de aula (ABP) de la asignatura **Sistemas Operativos**, Ingeniería de 
 
 | | |
 |---|---|
-| Autores | Leidy Yohanna Cardona Bayona · Gustavo Adolfo Cardona Bayona |
+| Autores | Gustavo Adolfo Cardona Bayona · Jonathan Soler Guevara · Sebastián Torrez Florez |
 | Lenguaje | Python 3.10 o superior |
 | Plataforma | Windows 10/11 (el núcleo de lectura también funciona en Linux) |
 | Estado | Entrega 2: estructura del prototipo, versión 0.1.0 |
