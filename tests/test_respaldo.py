@@ -2,6 +2,7 @@ import sqlite3
 import sys
 import tempfile
 import unittest
+from contextlib import closing
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
@@ -30,7 +31,8 @@ class PruebasRespaldo(unittest.TestCase):
         self.assertEqual(resultado["integridad"], "ok")
         self.assertEqual(resultado["filas"]["muestra"], 1)
         self.assertEqual(resultado["filas"]["proceso_muestra"], 2)
-        with sqlite3.connect(destino) as c:
+        # closing(): en Windows un archivo con una conexión abierta no se puede borrar
+        with closing(sqlite3.connect(destino)) as c:
             self.assertEqual(c.execute("SELECT COUNT(*) FROM proceso_muestra").fetchone()[0], 2)
 
     def test_respaldo_no_sobrescribe_un_archivo_existente(self):
