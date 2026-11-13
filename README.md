@@ -9,7 +9,7 @@ Proyecto de aula (ABP) de la asignatura **Sistemas Operativos**, Ingeniería de 
 | Autores | Gustavo Adolfo Cardona Bayona · Jonathan Soler Guevara · Sebastián Torrez Florez |
 | Lenguaje | Python 3.10 o superior (PC) y Java (app Android) |
 | Plataforma | Windows 10/11 (el núcleo de lectura también funciona en Linux); app para Android 8.0 o superior |
-| Estado | Versión 0.3.0: monitoreo continuo, alertas, API, app móvil, búsqueda de equipos e instalador para Windows |
+| Estado | Versión 0.4.0: monitoreo continuo, alertas, API, app móvil, búsqueda de equipos e instalador para Windows |
 
 ## Contexto
 
@@ -76,11 +76,13 @@ Celular / emulador  --HTTP-->  servidor.py (PC)  -->  mirs.db (SQLite)
 
 | Pestaña | Qué muestra |
 |---|---|
-| Panel | CPU, RAM, disco y red con su estado (Normal, Vigilar, Alerta), gráfica de los últimos 5 minutos con la línea del umbral, alerta activa y procesos de mayor consumo |
+| Panel | Chip 3D que gira según el uso de CPU dentro de un anillo animado; anillos de RAM, disco y red; alerta con pulso; gráfica en vivo de 5 minutos con umbral y lectura al tocar; mapa de calor de los núcleos lógicos; procesos de mayor consumo |
 | Procesos | Procesos de la última muestra con PID, estado, prioridad, hilos, CPU y memoria; búsqueda por nombre o PID |
 | Alertas | Alertas activas o todas, con severidad, mensaje y recomendación; botones para marcarlas como atendidas o descartarlas |
 
 La app es de consulta: no finaliza procesos ni cambia prioridades, porque esas acciones requieren confirmación frente al equipo. La única escritura es el estado de una alerta.
+
+**Diseño.** Tema oscuro tipo centro de control con tarjetas translúcidas y barra de navegación flotante. Las animaciones (anillos que se llenan, cifras que suben como contador, transición entre pestañas, pulso de alerta, vibración corta al llegar una alerta nueva) respetan la opción de Android de reducir animaciones. El chip es un modelo 3D propio (`Chip3DView`): rota los vértices, los proyecta con perspectiva, descarta las caras ocultas, las ordena de la más lejana a la más cercana y las sombrea con una luz direccional; se puede girar con el dedo. El mapa de núcleos muestra cómo el planificador del sistema operativo reparte la carga. Todo se dibuja con `Canvas`, sin librerías externas.
 
 Al igual que la interfaz del PC, la app separa la red de la pantalla: las consultas corren en un hilo aparte (`ExecutorService`) y los resultados se pintan en el hilo principal (`Handler`). La gráfica se dibuja con `Canvas`, sin librerías externas.
 
@@ -88,7 +90,7 @@ Al igual que la interfaz del PC, la app separa la red de la pantalla: las consul
 
 | Método y ruta | Respuesta |
 |---|---|
-| `GET /api/estado` | Equipo, última muestra, 5 procesos de mayor consumo y número de alertas activas |
+| `GET /api/estado` | Equipo, última muestra, uso de CPU por núcleo (`nucleos`), 5 procesos de mayor consumo y número de alertas activas |
 | `GET /api/muestras?cantidad=150` | Historial reciente en orden cronológico |
 | `GET /api/procesos` | Procesos de la última muestra |
 | `GET /api/alertas?estado=ACTIVA` | Alertas activas (`estado=TODAS` para todas) |
@@ -222,7 +224,7 @@ Para ver una alerta en la demostración, baje temporalmente el umbral de CPU en 
 python -m unittest discover -s tests -v
 ```
 
-Veinticinco pruebas cubren el recolector (rangos válidos, orden y límite de la lista de procesos, prioridad como entero), el almacenamiento (seis tablas, equipo sin duplicados, un umbral por recurso, llave foránea, `CHECK` de porcentajes y transacción sin procesos huérfanos), las reglas del analizador (umbral sostenido frente a pico corto, desviación del historial y posible fuga de memoria) y la API (estado, historial, umbrales, cambio de estado de una alerta, errores 400 y 404, y respuesta a la búsqueda de equipos por UDP).
+Veintiséis pruebas cubren el recolector (rangos válidos, orden y límite de la lista de procesos, prioridad como entero), el almacenamiento (seis tablas, equipo sin duplicados, un umbral por recurso, llave foránea, `CHECK` de porcentajes y transacción sin procesos huérfanos), las reglas del analizador (umbral sostenido frente a pico corto, desviación del historial y posible fuga de memoria) y la API (estado, historial, umbrales, cambio de estado de una alerta, errores 400 y 404, y respuesta a la búsqueda de equipos por UDP).
 
 ## Hoja de ruta
 
