@@ -9,7 +9,7 @@ probar() { local id="$1" nombre="$2"; shift 2
 
 p1() { systemctl is-active mirs.service; }
 p2() { u=$(ps -o user= -p "$(systemctl show -p MainPID --value mirs.service)"); [ "$u" = mirs ] && echo "proceso como $u"; }
-p3() { curl -sf "$API/api/estado" | python3 -c 'import json,sys; m=json.load(sys.stdin)["muestra"]; print(f"CPU {m[\"cpu_pct\"]} %, RAM {m[\"ram_pct\"]} %")'; }
+p3() { curl -sf "$API/api/estado" | python3 -c 'import json,sys; m=json.load(sys.stdin)["muestra"]; print("CPU %s %%, RAM %s %%" % (m["cpu_pct"], m["ram_pct"]))'; }
 p4() { if sudo -u mirs_operador touch /var/lib/mirs/x 2>/dev/null; then echo "pudo escribir"; return 1; fi
        sudo -u mirs_operador ls /var/lib/mirs >/dev/null && echo "lee, no escribe"; }
 p5() { if sudo -u nobody ls /var/lib/mirs >/dev/null 2>&1; then echo "nobody pudo leer"; return 1; fi; echo "otros sin acceso"; }

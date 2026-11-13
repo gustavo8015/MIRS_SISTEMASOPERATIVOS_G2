@@ -23,9 +23,11 @@ if ($ProbarBloqueo) {
     }
 }
 
+Start-Sleep -Seconds 5   # el registro de Seguridad escribe los eventos con un pequeño retraso
 Paso 'Eventos de seguridad registrados (últimos 30 minutos)'
 $ids = @{ 4720 = 'Cuenta creada'; 4732 = 'Miembro agregado a grupo local'; 4625 = 'Inicio de sesión fallido'
-          4740 = 'Cuenta bloqueada'; 4688 = 'Proceso creado (MIRS_Servidor)'; 4663 = 'Acceso a objeto (datos)' }
+          4740 = 'Cuenta bloqueada'; 4767 = 'Cuenta desbloqueada'; 4688 = 'Proceso creado (MIRS_Servidor)'
+          4656 = 'Acceso a C:\MIRS\datos denegado'; 4670 = 'Permisos de un objeto cambiados' }
 $desde = (Get-Date).AddMinutes(-30)
 $eventos = Get-WinEvent -FilterHashtable @{ LogName = 'Security'; Id = [int[]]$ids.Keys; StartTime = $desde } -ErrorAction SilentlyContinue |
     Where-Object { $_.Id -ne 4688 -or $_.Message -match 'MIRS_Servidor' }
@@ -35,7 +37,8 @@ $eventos | Group-Object Id | ForEach-Object {
 } | Sort-Object IdEvento | Format-Table -AutoSize
 
 Paso 'Detalle del bloqueo y de los intentos fallidos'
-$eventos | Where-Object Id -in 4625, 4740 | Sort-Object TimeCreated | Select-Object -Last 3 | ForEach-Object {
+Get-WinEvent -FilterHashtable @{ LogName = 'Security'; Id = 4625, 4740, 4767 } -MaxEvents 8 -ErrorAction SilentlyContinue |
+    Sort-Object TimeCreated | ForEach-Object {
     $x = [xml]$_.ToXml(); $d = @{}; $x.Event.EventData.Data | ForEach-Object { $d[$_.Name] = $_.'#text' }
     [pscustomobject]@{ Hora = $_.TimeCreated; Id = $_.Id; Cuenta = $d['TargetUserName']; Estado = $d['Status'] }
 } | Format-Table -AutoSize

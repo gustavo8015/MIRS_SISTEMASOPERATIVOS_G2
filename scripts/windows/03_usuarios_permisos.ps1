@@ -31,6 +31,7 @@ foreach ($u in @(
     } else {
         New-LocalUser -Name $u.Nombre -Password $segura -Description $u.Desc -PasswordNeverExpires:$false | Out-Null
     }
+    net user $u.Nombre /passwordreq:yes | Out-Null
     $claves[$u.Nombre] = $segura
     if (-not (Get-LocalGroupMember -Group $u.Grupo -Member $u.Nombre -ErrorAction SilentlyContinue)) {
         Add-LocalGroupMember -Group $u.Grupo -Member $u.Nombre

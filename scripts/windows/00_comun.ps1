@@ -28,7 +28,11 @@ function Requiere-Admin {
 function Esperar-Api([int]$segundos = 40) {
     $limite = (Get-Date).AddSeconds($segundos)
     while ((Get-Date) -lt $limite) {
-        try { return Invoke-RestMethod -Uri $UrlApi -TimeoutSec 3 } catch { Start-Sleep -Seconds 2 }
+        try {
+            $e = Invoke-RestMethod -Uri $UrlApi -TimeoutSec 3
+            if ($e.muestra) { return $e }   # la API ya respondió con la primera muestra
+        } catch { }
+        Start-Sleep -Seconds 2
     }
     return $null
 }

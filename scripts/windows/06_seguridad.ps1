@@ -19,10 +19,14 @@ auditpol /get /subcategory:"$($categorias -join ',')"
 
 Paso 'Auditoría de acceso a la base de datos (SACL en C:\MIRS\datos)'
 $acl = Get-Acl -Path $Dir.Datos -Audit
-$regla = New-Object System.Security.AccessControl.FileSystemAuditRule(
-    (New-Object Security.Principal.SecurityIdentifier 'S-1-1-0'), 'Delete,Write,ChangePermissions',
-    'ContainerInherit,ObjectInherit', 'None', 'Success,Failure')
-$acl.SetAuditRule($regla)
+# Se auditan los intentos fallidos de escribir o borrar (accesos no autorizados) y los cambios exitosos
+# de permisos o de propietario. Las escrituras normales del servicio no se auditan para no llenar el registro.
+$todos = New-Object Security.Principal.SecurityIdentifier 'S-1-1-0'
+$herencia = [System.Security.AccessControl.InheritanceFlags]'ContainerInherit,ObjectInherit'
+$acl.SetAuditRule((New-Object System.Security.AccessControl.FileSystemAuditRule($todos,
+    'Write,Delete,ChangePermissions,TakeOwnership', $herencia, 'None', 'Failure')))
+$acl.AddAuditRule((New-Object System.Security.AccessControl.FileSystemAuditRule($todos,
+    'Delete,ChangePermissions,TakeOwnership', $herencia, 'None', 'Success')))
 Set-Acl -Path $Dir.Datos -AclObject $acl
 (Get-Acl -Path $Dir.Datos -Audit).Audit | Format-Table IdentityReference, FileSystemRights, AuditFlags -AutoSize
 

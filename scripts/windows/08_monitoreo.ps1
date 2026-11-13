@@ -2,15 +2,20 @@
 # Compara lo que reporta MIRS con los contadores de rendimiento de Windows en el mismo momento.
 . "$PSScriptRoot\00_comun.ps1"
 
-Paso 'MIRS frente a los contadores de Windows'
-$contadores = Get-Counter -Counter '\Processor(_Total)\% Processor Time', '\Memory\% Committed Bytes In Use',
-    '\Memory\Available MBytes' -SampleInterval 2 -MaxSamples 1
+Paso 'MIRS frente a los contadores de Windows (promedio de los mismos 20 segundos)'
+# Las dos fuentes se leen durante la misma ventana y se comparan sus promedios.
+$inicio = Get-Date
+$contadores = Get-Counter -Counter '\Processor(_Total)\% Processor Time', '\Memory\Available MBytes' -SampleInterval 2 -MaxSamples 10
+$totalMB = (Get-CimInstance Win32_ComputerSystem).TotalPhysicalMemory / 1MB
+$cpuWin = ($contadores.CounterSamples | Where-Object Path -like '*processor time' | Measure-Object CookedValue -Average).Average
+$libreMB = ($contadores.CounterSamples | Where-Object Path -like '*available mbytes' | Measure-Object CookedValue -Average).Average
+$ventana = Invoke-RestMethod -Uri "http://127.0.0.1:$($Cfg.PuertoApi)/api/muestras?cantidad=30" -TimeoutSec 5 |
+    Where-Object { [datetime]$_.fecha_hora -ge $inicio }
 $estado = Invoke-RestMethod -Uri $UrlApi -TimeoutSec 5
-$so = Get-CimInstance Win32_OperatingSystem
-$ramWin = 100 * (1 - $so.FreePhysicalMemory / $so.TotalVisibleMemorySize)
-$cpuWin = ($contadores.CounterSamples | Where-Object Path -like '*processor time').CookedValue
-[pscustomobject]@{ Indicador = 'CPU (%)'; MIRS = $estado.muestra.cpu_pct; Windows = [Math]::Round($cpuWin, 1) },
-[pscustomobject]@{ Indicador = 'RAM en uso (%)'; MIRS = $estado.muestra.ram_pct; Windows = [Math]::Round($ramWin, 1) } |
+[pscustomobject]@{ Indicador = 'CPU (%)'; MIRS = [Math]::Round(($ventana | Measure-Object cpu_pct -Average).Average, 1)
+                   Windows = [Math]::Round($cpuWin, 1); Muestras = "$(@($ventana).Count) / 10" },
+[pscustomobject]@{ Indicador = 'RAM en uso (%)'; MIRS = [Math]::Round(($ventana | Measure-Object ram_pct -Average).Average, 1)
+                   Windows = [Math]::Round(100 * (1 - $libreMB / $totalMB), 1); Muestras = "$(@($ventana).Count) / 10" } |
     Format-Table -AutoSize
 Write-Host "Núcleos lógicos reportados por MIRS: $(@($estado.nucleos).Count)"
 

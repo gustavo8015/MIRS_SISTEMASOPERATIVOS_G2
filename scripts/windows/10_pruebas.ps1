@@ -65,17 +65,23 @@ Probar 'P12' 'Recuperación ante fallo: proceso terminado y restablecido por el 
 if ($Carga) {
     Probar 'P13' 'Carga de CPU sostenida genera alerta' {
         $previas = @(Invoke-RestMethod "http://127.0.0.1:$($Cfg.PuertoApi)/api/alertas" -TimeoutSec 5).Count
-        $n = [Environment]::ProcessorCount
-        $trabajos = 1..$n | ForEach-Object { Start-Job { $f = (Get-Date).AddSeconds(90); while ((Get-Date) -lt $f) { $null = 1 } } }
-        $alerta = $null; $limite = (Get-Date).AddSeconds(100)
-        while (-not $alerta -and (Get-Date) -lt $limite) {
+        # un proceso que ocupa el 100 % de un núcleo por cada núcleo lógico, durante 150 s como máximo
+        $carga = '$f=(Get-Date).AddSeconds(150); while((Get-Date) -lt $f){ for($i=0;$i -lt 100000;$i++){} }'
+        $hijos = 1..[Environment]::ProcessorCount | ForEach-Object {
+            Start-Process powershell.exe -ArgumentList '-NoProfile', '-Command', $carga -WindowStyle Hidden -PassThru }
+        $inicio = Get-Date; $alerta = $null
+        while (-not $alerta -and (Get-Date) -lt $inicio.AddSeconds(140)) {
             Start-Sleep -Seconds 5
             $alerta = Invoke-RestMethod "http://127.0.0.1:$($Cfg.PuertoApi)/api/alertas" -TimeoutSec 5 |
-                Where-Object tipo -eq 'PICO_CPU' | Select-Object -First 1
+                Where-Object { $_.tipo -eq 'PICO_CPU' -and $_.severidad -eq 'ALTA' } | Select-Object -First 1
         }
-        $trabajos | Stop-Job -PassThru | Remove-Job
-        Afirmar $alerta "sin alerta de CPU (alertas previas: $previas)"
-        "$($alerta.severidad): $($alerta.mensaje)" }
+        $hijos | Stop-Process -Force -ErrorAction SilentlyContinue
+        $serie = Invoke-RestMethod "http://127.0.0.1:$($Cfg.PuertoApi)/api/muestras?cantidad=80" -TimeoutSec 5 |
+            Where-Object { [datetime]$_.fecha_hora -ge $inicio }
+        $resumen = "CPU durante la carga: promedio $([Math]::Round(($serie | Measure-Object cpu_pct -Average).Average)) %, " +
+                   "mínimo $([Math]::Round(($serie | Measure-Object cpu_pct -Minimum).Minimum)) %"
+        Afirmar $alerta "sin alerta ALTA de CPU después de $([Math]::Round(((Get-Date) - $inicio).TotalSeconds)) s; $resumen"
+        "$([Math]::Round(([datetime]$alerta.fecha_hora - $inicio).TotalSeconds)) s después de iniciar la carga: $($alerta.mensaje) $resumen" }
 }
 
 $resultados | Format-Table ID, Resultado, Prueba, Detalle -AutoSize -Wrap
