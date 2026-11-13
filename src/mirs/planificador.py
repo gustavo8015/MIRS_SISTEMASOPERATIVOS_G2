@@ -21,6 +21,7 @@ class Planificador(threading.Thread):
         self.id_equipo = bd.registrar_equipo(datos_equipo())
         bd.crear_umbrales_por_defecto(self.id_equipo)
         self.muestras_tomadas = 0
+        self.nucleos: list[float] = []  # uso por núcleo de la última muestra (solo en memoria)
 
     def run(self) -> None:
         # cpu_percent mide durante una parte del intervalo y la lista de procesos usa el resto
@@ -30,6 +31,7 @@ class Planificador(threading.Thread):
                 muestra = tomar_muestra(medicion)
                 procesos = listar_procesos(config.TOP_PROCESOS, espera=0.4)
                 id_muestra = self.bd.guardar_muestra(self.id_equipo, muestra, procesos)
+                self.nucleos = muestra.get("cpu_nucleos", [])
                 nuevas = analizar(self.bd, self.id_equipo, id_muestra)
                 self.muestras_tomadas += 1
                 if nuevas:

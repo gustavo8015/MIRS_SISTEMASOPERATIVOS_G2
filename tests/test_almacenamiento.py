@@ -56,6 +56,11 @@ class PruebasAlmacenamiento(unittest.TestCase):
         self.assertEqual(n, 2)
         self.assertEqual(self.bd.ultimas_muestras(id_equipo)[0]["cpu_pct"], 42.0)
 
+    def test_uso_por_nucleo_no_se_guarda_en_la_base(self):
+        id_equipo = self.bd.registrar_equipo(EQUIPO)
+        self.bd.guardar_muestra(id_equipo, {**MUESTRA, "cpu_nucleos": [10.0, 20.0]}, [])
+        self.assertEqual(self.bd.ultimas_muestras(id_equipo)[0]["cpu_pct"], 42.0)
+
     def test_llave_foranea_rechaza_equipo_inexistente(self):
         with self.assertRaises(sqlite3.IntegrityError):
             self.bd.guardar_muestra(999, MUESTRA, [])

@@ -34,15 +34,20 @@ def datos_equipo() -> dict:
 
 
 def tomar_muestra(intervalo: float = 1.0) -> dict:
-    """Uso global de CPU, RAM, disco y red medido durante `intervalo` segundos."""
+    """Uso de CPU (global y por núcleo lógico), RAM, disco y red medido durante `intervalo` segundos.
+
+    `cpu_nucleos` no se guarda en la base de datos: se publica solo en vivo para el mapa de núcleos.
+    """
     red_antes = psutil.net_io_counters()
     inicio = time.monotonic()
-    cpu = psutil.cpu_percent(interval=intervalo)  # bloquea durante el intervalo
+    nucleos = psutil.cpu_percent(interval=intervalo, percpu=True)  # bloquea durante el intervalo
+    cpu = round(sum(nucleos) / len(nucleos), 1) if nucleos else 0.0
     transcurrido = max(time.monotonic() - inicio, 1e-6)
     red_despues = psutil.net_io_counters()
     return {
         "fecha_hora": datetime.now().isoformat(timespec="seconds"),
         "cpu_pct": cpu,
+        "cpu_nucleos": nucleos,
         "ram_pct": psutil.virtual_memory().percent,
         "disco_pct": psutil.disk_usage(_raiz_disco()).percent,
         "red_envio_kbps": round((red_despues.bytes_sent - red_antes.bytes_sent) * 8 / 1000 / transcurrido, 1),

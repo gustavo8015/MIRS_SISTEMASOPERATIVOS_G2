@@ -37,7 +37,9 @@ from .almacenamiento import Almacenamiento
 log = logging.getLogger("mirs.servidor")
 
 
-def crear_manejador(bd: Almacenamiento, id_equipo: int, intervalo: float = config.INTERVALO_SEG):
+def crear_manejador(bd: Almacenamiento, id_equipo: int, intervalo: float = config.INTERVALO_SEG,
+                    nucleos=lambda: []):
+    """`nucleos` es una función que devuelve el uso por núcleo de la última muestra."""
     class Manejador(BaseHTTPRequestHandler):
         server_version = f"MIRS/{__version__}"
 
@@ -67,6 +69,7 @@ def crear_manejador(bd: Almacenamiento, id_equipo: int, intervalo: float = confi
                         "muestra": actual,
                         "procesos": bd.procesos_de_muestra(actual["id_muestra"])[:5] if actual else [],
                         "alertas_activas": len(bd.alertas(id_equipo, solo_activas=True, cantidad=500)),
+                        "nucleos": list(nucleos()),
                     })
                 elif url.path == "/api/muestras":
                     cantidad = min(max(int(q.get("cantidad", ["150"])[0]), 1), 1000)
@@ -187,7 +190,8 @@ def main(argv: list[str] | None = None, lan_por_defecto: bool = False) -> None:
     host = "0.0.0.0" if args.lan else "127.0.0.1"
     try:
         servidor = ThreadingHTTPServer((host, args.puerto),
-                                       crear_manejador(bd, planificador.id_equipo, args.intervalo))
+                                       crear_manejador(bd, planificador.id_equipo, args.intervalo,
+                                                       lambda: planificador.nucleos))
     except OSError:
         log.error("El puerto %d ya está en uso. ¿Hay otro servidor de MIRS abierto?", args.puerto)
         planificador.detener()

@@ -31,7 +31,8 @@ class PruebasApi(unittest.TestCase):
               "cpu_pct": 52.4, "memoria_mb": 1812.3, "hilos": 48}])
         self.id_alerta = self.bd.guardar_alerta({"id_muestra": id_muestra, "tipo": "PICO_CPU",
                                                  "severidad": "ALTA", "mensaje": "CPU alta"})
-        self.srv = ThreadingHTTPServer(("127.0.0.1", 0), crear_manejador(self.bd, self.id_equipo))
+        self.srv = ThreadingHTTPServer(("127.0.0.1", 0),
+                                       crear_manejador(self.bd, self.id_equipo, nucleos=lambda: [92.0, 40.5]))
         threading.Thread(target=self.srv.serve_forever, daemon=True).start()
         self.base = f"http://127.0.0.1:{self.srv.server_address[1]}"
 
@@ -59,6 +60,7 @@ class PruebasApi(unittest.TestCase):
         self.assertEqual(e["muestra"]["cpu_pct"], 87.0)
         self.assertEqual(e["procesos"][0]["nombre"], "chrome.exe")
         self.assertEqual(e["alertas_activas"], 1)
+        self.assertEqual(e["nucleos"], [92.0, 40.5])
 
     def test_muestras_y_umbrales(self):
         self.assertEqual(len(self.get("/api/muestras?cantidad=10")), 1)

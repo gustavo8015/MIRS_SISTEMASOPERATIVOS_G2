@@ -75,7 +75,7 @@ class Almacenamiento:
                                         red_envio_kbps, red_recepcion_kbps)
                    VALUES (:id_equipo, :fecha_hora, :cpu_pct, :ram_pct, :disco_pct,
                            :red_envio_kbps, :red_recepcion_kbps)""",
-                {"id_equipo": id_equipo, **muestra},
+                {"id_equipo": id_equipo, **{k: v for k, v in muestra.items() if k != "cpu_nucleos"}},
             )
             id_muestra = cursor.lastrowid
             c.executemany(

@@ -22,6 +22,8 @@ class PruebasRecolector(unittest.TestCase):
             self.assertLessEqual(m[campo], 100)
         self.assertGreaterEqual(m["red_envio_kbps"], 0)
         self.assertGreaterEqual(m["red_recepcion_kbps"], 0)
+        import psutil
+        self.assertEqual(len(m["cpu_nucleos"]), psutil.cpu_count(logical=True))
 
     def test_listar_procesos_respeta_el_tope_y_el_orden(self):
         procesos = listar_procesos(top=5, espera=0.2)
