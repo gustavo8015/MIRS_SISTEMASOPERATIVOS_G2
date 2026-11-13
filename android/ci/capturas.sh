@@ -19,7 +19,7 @@ tocar() {  # toca el elemento de la interfaz con el id indicado
 }
 captura() {
   adb exec-out screencap -p > "capturas/$1.png"
-  echo "===CAPTURA $1 INICIO==="; base64 -w 0 "capturas/$1.png"; echo; echo "===CAPTURA $1 FIN==="
+  echo "===CAPTURA $1 INICIO==="; base64 -w 3000 "capturas/$1.png"; echo "===CAPTURA $1 FIN==="
 }
 
 captura 01_panel
