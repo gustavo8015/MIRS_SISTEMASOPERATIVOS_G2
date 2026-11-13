@@ -41,4 +41,4 @@ Get-WinEvent -FilterHashtable @{ LogName = 'Security'; Id = 4625, 4740, 4767 } -
     Sort-Object TimeCreated | ForEach-Object {
     $x = [xml]$_.ToXml(); $d = @{}; $x.Event.EventData.Data | ForEach-Object { $d[$_.Name] = $_.'#text' }
     [pscustomobject]@{ Hora = $_.TimeCreated; Id = $_.Id; Cuenta = $d['TargetUserName']; Estado = $d['Status'] }
-} | Format-Table -AutoSize
+} | Where-Object Cuenta -like 'mirs_*' | Format-Table -AutoSize

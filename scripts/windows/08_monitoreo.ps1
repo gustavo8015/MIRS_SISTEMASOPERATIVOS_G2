@@ -9,8 +9,9 @@ $contadores = Get-Counter -Counter '\Processor(_Total)\% Processor Time', '\Memo
 $totalMB = (Get-CimInstance Win32_ComputerSystem).TotalPhysicalMemory / 1MB
 $cpuWin = ($contadores.CounterSamples | Where-Object Path -like '*processor time' | Measure-Object CookedValue -Average).Average
 $libreMB = ($contadores.CounterSamples | Where-Object Path -like '*available mbytes' | Measure-Object CookedValue -Average).Average
-$ventana = Invoke-RestMethod -Uri "http://127.0.0.1:$($Cfg.PuertoApi)/api/muestras?cantidad=30" -TimeoutSec 5 |
-    Where-Object { [datetime]$_.fecha_hora -ge $inicio }
+# (en Windows PowerShell 5.1 un arreglo JSON llega como un solo objeto: se guarda antes de filtrarlo)
+$ultimas = Invoke-RestMethod -Uri "http://127.0.0.1:$($Cfg.PuertoApi)/api/muestras?cantidad=30" -TimeoutSec 5
+$ventana = $ultimas | Where-Object { [datetime]$_.fecha_hora -ge $inicio }
 $estado = Invoke-RestMethod -Uri $UrlApi -TimeoutSec 5
 [pscustomobject]@{ Indicador = 'CPU (%)'; MIRS = [Math]::Round(($ventana | Measure-Object cpu_pct -Average).Average, 1)
                    Windows = [Math]::Round($cpuWin, 1); Muestras = "$(@($ventana).Count) / 10" },

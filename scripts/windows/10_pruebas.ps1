@@ -4,6 +4,7 @@ param([switch]$Carga)
 . "$PSScriptRoot\00_comun.ps1"
 $ErrorActionPreference = 'Continue'
 $resultados = New-Object System.Collections.Generic.List[object]
+Paso "Pruebas de funcionamiento en $env:COMPUTERNAME"
 
 function Probar([string]$id, [string]$nombre, [scriptblock]$prueba) {
     try { $detalle = & $prueba; $ok = $true } catch { $detalle = $_.Exception.Message; $ok = $false }
@@ -72,12 +73,12 @@ if ($Carga) {
         $inicio = Get-Date; $alerta = $null
         while (-not $alerta -and (Get-Date) -lt $inicio.AddSeconds(140)) {
             Start-Sleep -Seconds 5
-            $alerta = Invoke-RestMethod "http://127.0.0.1:$($Cfg.PuertoApi)/api/alertas" -TimeoutSec 5 |
-                Where-Object { $_.tipo -eq 'PICO_CPU' -and $_.severidad -eq 'ALTA' } | Select-Object -First 1
+            $activas = Invoke-RestMethod "http://127.0.0.1:$($Cfg.PuertoApi)/api/alertas" -TimeoutSec 5
+            $alerta = $activas | Where-Object { $_.tipo -eq 'PICO_CPU' -and $_.severidad -eq 'ALTA' } | Select-Object -First 1
         }
         $hijos | Stop-Process -Force -ErrorAction SilentlyContinue
-        $serie = Invoke-RestMethod "http://127.0.0.1:$($Cfg.PuertoApi)/api/muestras?cantidad=80" -TimeoutSec 5 |
-            Where-Object { [datetime]$_.fecha_hora -ge $inicio }
+        $todas = Invoke-RestMethod "http://127.0.0.1:$($Cfg.PuertoApi)/api/muestras?cantidad=80" -TimeoutSec 5
+        $serie = $todas | Where-Object { [datetime]$_.fecha_hora -ge $inicio }
         $resumen = "CPU durante la carga: promedio $([Math]::Round(($serie | Measure-Object cpu_pct -Average).Average)) %, " +
                    "mínimo $([Math]::Round(($serie | Measure-Object cpu_pct -Minimum).Minimum)) %"
         Afirmar $alerta "sin alerta ALTA de CPU después de $([Math]::Round(((Get-Date) - $inicio).TotalSeconds)) s; $resumen"
