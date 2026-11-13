@@ -305,3 +305,5 @@ Los mensajes siguen [Conventional Commits](https://www.conventionalcommits.org/e
 - [Ficha técnica (Entrega 1)](docs/ficha/Entrega1_Microproyecto_MIRS.png)
 - [Mockups de la interfaz](docs/mockups/)
 - Documento de la Entrega 2: [Word](docs/Entrega2_Estructura_Prototipo_MIRS.docx) · [PDF](docs/Entrega2_Estructura_Prototipo_MIRS.pdf)
+- Documento técnico final (instalación, configuración, administración y pruebas del entorno): [Word](docs/Documento_Tecnico_Final_MIRS.docx) · [PDF](docs/Documento_Tecnico_Final_MIRS.pdf)
+- [Arquitectura del entorno operativo](docs/diagramas/arquitectura_entorno.png) y [evidencias](evidencias/)
