@@ -195,7 +195,8 @@ MIRS_SISTEMASOPERATIVOS_G2/
 │   ├── ficha/             ficha técnica (Entrega 1)
 │   ├── diagramas/         arquitectura y modelo relacional (fuente y PNG)
 │   ├── mockups/           pantallas propuestas de la interfaz (HTML y PNG)
-│   └── Entrega2_*.docx/pdf documento de la Entrega 2
+│   ├── Entrega2_*.docx/pdf documento de la Entrega 2
+│   └── Documento_Tecnico_Final_MIRS.docx/pdf  documento técnico final
 ├── requirements.txt
 └── README.md
 ```
@@ -263,16 +264,18 @@ Treinta y ocho pruebas cubren el recolector (rangos válidos, orden y límite de
 |---|---|---|
 | 1 | Ficha técnica del proyecto | Entregada |
 | 2 (Fase I) | Levantamiento de información, descripción, estructura del prototipo y tecnologías | Entregada |
-| Fase II (S14) | App móvil MIRS Móvil funcionando con el servidor de monitoreo, alertas, conexión Wi-Fi y Bluetooth, pruebas y evidencias | Esta versión |
-| Final | Socialización y demostración | Pendiente |
+| Fase II (S14) | App móvil MIRS Móvil funcionando con el servidor de monitoreo, alertas, conexión Wi-Fi y Bluetooth, pruebas y evidencias | Entregada |
+| Final (S15) | Versión 1.0.0: solución terminada, prueba de la app en emulador, resultados y documento técnico final | Esta versión |
 
-### Avance de la Fase II
+### Resultado final (versión 1.0.0)
 
 - **App MIRS Móvil (Android):** panel en vivo con el chip 3D, anillos de CPU, RAM, disco y red, gráfica del historial y mapa de núcleos; lista de procesos con búsqueda; alertas con severidad, recomendación y acciones Atendida o Descartar; búsqueda automática de equipos en la red y conexión por Bluetooth con emparejamiento desde la app.
 - **Servidor que consulta la app:** toma una muestra cada 2 s, la guarda en SQLite, aplica las tres reglas de detección y la publica en la API (TCP 8765).
 - **Entorno de trabajo:** Android Studio con Gradle 8.7 y JDK 17 (compileSdk 34, minSdk 26), emulador Android 14 (API 34) y Python 3.12 para el servidor. GitHub Actions compila el APK y el `.exe` en cada cambio.
 - **Pruebas:** 38 pruebas unitarias del servidor y una prueba de la app en un emulador real (`.github/workflows/app-android.yml`) que instala el APK, lo conecta al servidor y recorre sus pantallas.
 - **Evidencias:** capturas de la app funcionando y resultado de las pruebas en [`evidencias/`](evidencias/).
+- **Resultados:** los ocho requerimientos funcionales implementados; 38 de 38 pruebas del servidor superadas; la app abre en 3,4 s en arranque en frío, se conecta sola al servidor y muestra alertas detectadas en tiempo real.
+- **Documentación:** [documento técnico final](docs/Documento_Tecnico_Final_MIRS.pdf) (APA 7) y [arquitectura app y servidor](docs/diagramas/arquitectura_app_servidor.png).
 
 ## Convención de commits
 
@@ -283,4 +286,5 @@ Los mensajes siguen [Conventional Commits](https://www.conventionalcommits.org/e
 - [Ficha técnica (Entrega 1)](docs/ficha/Entrega1_Microproyecto_MIRS.png)
 - [Mockups de la interfaz](docs/mockups/)
 - Documento de la Entrega 2: [Word](docs/Entrega2_Estructura_Prototipo_MIRS.docx) · [PDF](docs/Entrega2_Estructura_Prototipo_MIRS.pdf)
-- [Evidencias de la Fase II](evidencias/)
+- Documento técnico final: [Word](docs/Documento_Tecnico_Final_MIRS.docx) · [PDF](docs/Documento_Tecnico_Final_MIRS.pdf)
+- [Evidencias](evidencias/)
