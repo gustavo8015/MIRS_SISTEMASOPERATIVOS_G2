@@ -23,8 +23,6 @@ captura() {
 }
 
 captura 01_panel
-adb shell input swipe 540 1900 540 900 600; sleep 3
-captura 02_panel_historial
 tocar nav_procesos; sleep 6
 captura 03_procesos
 tocar nav_alertas; sleep 6
