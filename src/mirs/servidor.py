@@ -4,7 +4,8 @@ Uso (desde la carpeta del repositorio, con PYTHONPATH=src):
     python -m mirs.servidor                 # solo este PC y el emulador de Android (127.0.0.1:8765)
     python -m mirs.servidor --lan           # también otros equipos de la red (0.0.0.0:8765)
 
-Con --bluetooth COM5 también atiende a la app por Bluetooth (ver bluetooth.py).
+Con --bluetooth también atiende a la app por Bluetooth y busca solo el puerto COM entrante
+(--bluetooth COM5 fija uno). MIRS_Servidor.exe lo hace por defecto (ver bluetooth.py).
 
 Con --lan el servidor además responde a la búsqueda de equipos de la app: escucha en UDP 8766
 el mensaje MIRS_BUSCAR y contesta con su nombre y su puerto, así la app lo encuentra sin escribir la IP.
@@ -170,7 +171,8 @@ def ips_locales() -> list[str]:
     return sorted(ip for ip in ips if not ip.startswith("127."))
 
 
-def main(argv: list[str] | None = None, lan_por_defecto: bool = False) -> None:
+def main(argv: list[str] | None = None, lan_por_defecto: bool = False,
+         bluetooth_por_defecto: str | None = None) -> None:
     from .planificador import Planificador
 
     parser = argparse.ArgumentParser(description="MIRS: monitoreo del PC y API para la app móvil.")
@@ -179,8 +181,11 @@ def main(argv: list[str] | None = None, lan_por_defecto: bool = False) -> None:
                         help="aceptar conexiones de otros equipos de la red y responder a la búsqueda")
     parser.add_argument("--solo-local", dest="lan", action="store_false",
                         help="atender solo a este PC y al emulador de Android")
-    parser.add_argument("--bluetooth", metavar="COM",
-                        help="puerto COM entrante de Bluetooth para atender a la app sin red (p. ej. COM5)")
+    parser.add_argument("--bluetooth", metavar="COM", nargs="?", const="auto", default=bluetooth_por_defecto,
+                        help="atender a la app por Bluetooth; sin valor busca solo el puerto COM entrante, "
+                             "o indique uno (p. ej. COM5)")
+    parser.add_argument("--sin-bluetooth", dest="bluetooth", action="store_const", const=None,
+                        help="no usar Bluetooth")
     parser.add_argument("--intervalo", type=float, default=config.INTERVALO_SEG)
     parser.add_argument("--bd", default=str(config.RUTA_BD))
     args = parser.parse_args(argv)

@@ -1,7 +1,8 @@
 """Punto de entrada de MIRS_Servidor.exe (empaquetado con PyInstaller).
 
-Al ejecutar el .exe con doble clic, el servidor arranca en modo red (--lan): monitorea este PC,
-publica la API en el puerto 8765 y responde a la búsqueda de equipos de la app MIRS Móvil.
+Al ejecutar el .exe con doble clic, el servidor arranca en modo red (--lan) y con Bluetooth
+automático: monitorea este PC, publica la API en el puerto 8765, responde a la búsqueda de equipos
+de la app MIRS Móvil y atiende por Bluetooth en el puerto COM entrante que encuentre solo.
 """
 import sys
 from pathlib import Path
@@ -13,7 +14,7 @@ from mirs.servidor import main  # noqa: E402
 
 if __name__ == "__main__":
     try:
-        main(lan_por_defecto=True)
+        main(lan_por_defecto=True, bluetooth_por_defecto="auto")
     except SystemExit as salida:
         if config.EMPAQUETADO and salida.code:
             input("Presione Enter para cerrar...")

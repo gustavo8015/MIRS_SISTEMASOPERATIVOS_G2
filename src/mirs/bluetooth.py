@@ -11,15 +11,54 @@ Protocolo de líneas (UTF-8, una petición y una respuesta por línea):
 
 Cada petición se reenvía a la API HTTP local (127.0.0.1), así que por Bluetooth y por red se ven
 exactamente los mismos datos.
+
+Detección automática: con el puerto "auto" no hay que escribir el número. En Windows, el
+identificador de cada puerto COM de Bluetooth empieza por BTHENUM y termina con la dirección del
+dispositivo remoto; el puerto entrante no tiene dispositivo remoto, así que su dirección es
+000000000000. Por ejemplo:
+    entrante: BTHENUM\{00001101-...}_LOCALMFG&0000\7&2E2C4F1&0&000000000000_00000000
+    saliente: BTHENUM\{00001101-...}_LOCALMFG&0002\7&2E2C4F1&0&D0C5F3A1B2C3_C00000000
 """
 from __future__ import annotations
 
 import logging
+import re
 import threading
 import urllib.error
 import urllib.request
 
 log = logging.getLogger("mirs.bluetooth")
+
+AUTO = "auto"
+_DIRECCION = re.compile(r"&([0-9A-F]{12})_[0-9A-F]+$", re.I)
+
+
+def es_entrante(hwid: str) -> bool:
+    """True si el identificador corresponde a un puerto COM entrante de Bluetooth."""
+    if "BTHENUM" not in hwid.upper():
+        return False
+    coincidencia = _DIRECCION.search(hwid.strip())
+    return bool(coincidencia) and coincidencia.group(1) == "000000000000"
+
+
+def detectar_puerto(listar=None) -> str | None:
+    """Devuelve el puerto COM entrante de Bluetooth (por ejemplo "COM8") o None si no hay.
+
+    `listar` permite probar la función sin Windows; por defecto usa serial.tools.list_ports.
+    """
+    if listar is None:
+        try:
+            from serial.tools import list_ports
+        except ImportError:
+            return None
+        listar = list_ports.comports
+    try:
+        puertos = list(listar())
+    except Exception:  # en Linux sin pyserial completo o sin permisos
+        return None
+    entrantes = sorted((p.device for p in puertos if es_entrante(p.hwid or "")),
+                       key=lambda d: int(re.sub(r"\D", "", d) or 0))
+    return entrantes[0] if entrantes else None
 
 
 def atender(linea: str, url_api: str) -> str:
@@ -44,9 +83,11 @@ def atender(linea: str, url_api: str) -> str:
 class PuenteBluetooth(threading.Thread):
     """Lee peticiones del puerto COM de Bluetooth y escribe las respuestas."""
 
-    def __init__(self, puerto: str, url_api: str, abrir=None):
+    def __init__(self, puerto: str, url_api: str, abrir=None, detectar=detectar_puerto):
         super().__init__(name="mirs-bluetooth", daemon=True)
-        self.puerto = puerto
+        self.automatico = puerto.lower() == AUTO
+        self.puerto = None if self.automatico else puerto
+        self._detectar = detectar
         self.url_api = url_api.rstrip("/")
         self._abrir = abrir or self._abrir_serial
         self._detener = threading.Event()
@@ -59,7 +100,22 @@ class PuenteBluetooth(threading.Thread):
 
     def run(self) -> None:
         avisado = False
+        sin_puerto_avisado = False
         while not self._detener.is_set():
+            if self.automatico:
+                encontrado = self._detectar()
+                if encontrado is None:
+                    if not sin_puerto_avisado:
+                        log.info("Bluetooth: no hay un puerto COM entrante. Para usar Bluetooth créelo en "
+                                 "Más opciones de Bluetooth > Puertos COM > Agregar > Entrante "
+                                 "(se detecta solo, sin reiniciar).")
+                        sin_puerto_avisado = True
+                    self._detener.wait(10)
+                    continue
+                if encontrado != self.puerto:
+                    log.info("Bluetooth: puerto entrante detectado: %s", encontrado)
+                self.puerto = encontrado
+                sin_puerto_avisado = False
             try:
                 conexion = self._abrir(self.puerto)
             except Exception as error:  # el puerto no existe o está ocupado

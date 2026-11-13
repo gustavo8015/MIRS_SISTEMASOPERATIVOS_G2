@@ -101,3 +101,47 @@ class PruebasPuente(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class PuertoFalso:
+    def __init__(self, device, hwid):
+        self.device = device
+        self.hwid = hwid
+
+
+ENTRANTE = r"BTHENUM\{00001101-0000-1000-8000-00805F9B34FB}_LOCALMFG&0000\7&2E2C4F1&0&000000000000_00000000"
+SALIENTE = r"BTHENUM\{00001101-0000-1000-8000-00805F9B34FB}_LOCALMFG&0002\7&2E2C4F1&0&D0C5F3A1B2C3_C00000000"
+USB = "USB VID:PID=1A86:7523 SER= LOCATION=1-2"
+
+
+class PruebasDeteccion(unittest.TestCase):
+    def test_distingue_entrante_de_saliente(self):
+        from mirs.bluetooth import es_entrante
+        self.assertTrue(es_entrante(ENTRANTE))
+        self.assertFalse(es_entrante(SALIENTE))
+        self.assertFalse(es_entrante(USB))
+
+    def test_detecta_el_entrante_entre_varios_puertos(self):
+        from mirs.bluetooth import detectar_puerto
+        puertos = [PuertoFalso("COM3", USB), PuertoFalso("COM9", SALIENTE), PuertoFalso("COM8", ENTRANTE)]
+        self.assertEqual(detectar_puerto(lambda: puertos), "COM8")
+
+    def test_sin_entrante_devuelve_none(self):
+        from mirs.bluetooth import detectar_puerto
+        self.assertIsNone(detectar_puerto(lambda: [PuertoFalso("COM9", SALIENTE)]))
+
+    def test_modo_auto_usa_el_puerto_detectado(self):
+        abiertos = []
+
+        def abrir(puerto):
+            abiertos.append(puerto)
+            raise OSError("solo se registra el intento")
+
+        puente = PuenteBluetooth("auto", "http://127.0.0.1:1", abrir=abrir, detectar=lambda: "COM8")
+        puente.start()
+        for _ in range(40):
+            if abiertos:
+                break
+            time.sleep(0.05)
+        puente.detener()
+        self.assertEqual(abiertos[0], "COM8")
