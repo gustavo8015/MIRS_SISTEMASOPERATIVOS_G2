@@ -24,7 +24,7 @@ jobs:
           python-version: "3.12"
 
       - name: Instalar dependencias
-        run: pip install psutil pyinstaller
+        run: pip install psutil pyserial pyinstaller
 
       - name: Pruebas unitarias
         run: python -m unittest discover -s tests -v
@@ -32,7 +32,7 @@ jobs:
       - name: Empaquetar con PyInstaller
         run: >
           pyinstaller --onefile --name MIRS_Servidor --paths src
-          --add-data "database/schema.sql;database" --collect-submodules mirs
+          --add-data "database/schema.sql;database" --collect-submodules mirs --hidden-import serial
           --noconfirm mirs_servidor.py
 
       - name: Prueba de humo del .exe
@@ -61,3 +61,5 @@ jobs:
             2. Si Windows muestra "Windows protegió su PC", elija "Más información" y "Ejecutar de todas formas".
             3. Si el firewall pregunta, permita el acceso en redes privadas.
             4. En la app MIRS Móvil use "Buscar equipos" (mismo WiFi) o escriba http://IP-del-PC:8765.
+            Bluetooth: cree un puerto COM entrante en Windows (Más opciones de Bluetooth > Puertos COM) y ejecute
+            MIRS_Servidor.exe --bluetooth COM5; en la app toque el ícono de Bluetooth y elija el portátil.
