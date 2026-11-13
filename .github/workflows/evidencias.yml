@@ -1,0 +1,74 @@
+# Ejecuta los scripts de administración de MIRS en máquinas limpias de GitHub (Windows y Ubuntu)
+# y guarda la salida de cada uno como evidencia (artefacto "evidencias-*").
+name: Evidencias de administración
+
+on:
+  push:
+    branches: [main]
+    paths: ["scripts/**", "config/**", ".github/workflows/evidencias.yml"]
+  workflow_dispatch:
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compilar MIRS_Servidor.exe
+        run: |
+          pip install psutil pyserial pyinstaller
+          pyinstaller --onefile --name MIRS_Servidor --paths src --add-data "database/schema.sql;database" --collect-submodules mirs --hidden-import serial --noconfirm mirs_servidor.py
+
+      - name: Ejecutar scripts de administración
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          New-Item -ItemType Directory -Force evidencias\windows | Out-Null
+          $pasos = @(
+            @{ n = '01_entorno';           c = { .\scripts\windows\01_entorno.ps1 } },
+            @{ n = '02_instalar';          c = { .\scripts\windows\02_instalar.ps1 -Origen dist\MIRS_Servidor.exe } },
+            @{ n = '06_seguridad';         c = { .\scripts\windows\06_seguridad.ps1 } },
+            @{ n = '03_usuarios_permisos'; c = { .\scripts\windows\03_usuarios_permisos.ps1 -ProbarAcceso } },
+            @{ n = '04_servicio';          c = { .\scripts\windows\04_servicio.ps1 } },
+            @{ n = '05_firewall';          c = { .\scripts\windows\05_firewall.ps1 } },
+            @{ n = '07_respaldo';          c = { Start-Sleep 20; .\scripts\windows\07_respaldo.ps1 -Registrar } },
+            @{ n = '09_vigilante';         c = { .\scripts\windows\09_vigilante.ps1 -Registrar } },
+            @{ n = '08_monitoreo';         c = { .\scripts\windows\08_monitoreo.ps1 } },
+            @{ n = '10_pruebas';           c = { .\scripts\windows\10_pruebas.ps1 -Carga } },
+            @{ n = '11_auditoria';         c = { .\scripts\windows\11_auditoria.ps1 -ProbarBloqueo } }
+          )
+          $fallas = 0
+          foreach ($p in $pasos) {
+            Write-Host "##[group]$($p.n)"
+            try { $s = & $p.c *>&1 | Out-String -Width 160 } catch { $s = "ERROR: $($_ | Out-String)"; $fallas++ }
+            if ($LASTEXITCODE) { $fallas++; $s += "`nCódigo de salida: $LASTEXITCODE"; $global:LASTEXITCODE = 0 }
+            Write-Host $s
+            $s | Out-File -Encoding utf8 "evidencias\windows\$($p.n).txt"
+            Write-Host "##[endgroup]"
+          }
+          if ($fallas) { throw "$fallas paso(s) con error" }
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: evidencias-windows
+          path: evidencias/windows
+
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Instalar como servicio y probar
+        run: |
+          mkdir -p evidencias/linux
+          sudo bash scripts/linux/instalar.sh 2>&1 | tee evidencias/linux/instalar.txt
+          sleep 15
+          sudo bash scripts/linux/pruebas.sh 2>&1 | tee evidencias/linux/pruebas.txt
+          exit ${PIPESTATUS[0]}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: evidencias-linux
+          path: evidencias/linux
