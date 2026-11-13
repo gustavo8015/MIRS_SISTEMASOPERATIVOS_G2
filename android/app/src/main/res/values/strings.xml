@@ -12,6 +12,7 @@
     <string name="ayuda_busqueda">En el PC que quiere ver, abra MIRS_Servidor.exe (o python -m mirs.servidor --lan) y conecte el celular a la misma red WiFi. Si la red bloquea la búsqueda, escriba la dirección con el botón Servidor.</string>
     <string name="escribir_direccion">Escribir dirección</string>
     <string name="cerrar">Cerrar</string>
+    <string name="ayuda">Ayuda</string>
     <string name="conectado_a">Conectado a %1$s</string>
     <string name="conectando">Conectando con el PC…</string>
     <string name="sin_conexion">Sin conexión con %1$s. Verifique que el servidor de MIRS esté corriendo.</string>
@@ -31,8 +32,18 @@
     <string name="sin_conexion_detalle">No responde el servidor en
 %1$s
 
-Verifique que la ventana de MIRS siga abierta en el PC y que estén en la misma red.</string>
+Verifique que la ventana de MIRS siga abierta en el PC y que estén en la misma red (o, por Bluetooth, que el portátil esté cerca y el servidor tenga --bluetooth).</string>
     <string name="reintentar">Reintentar</string>
+    <string name="menu_bluetooth">Conectar por Bluetooth</string>
+    <string name="bt_elegir">Elija el portátil emparejado</string>
+    <string name="bt_sin_adaptador">Este dispositivo no tiene Bluetooth. El emulador de Android Studio no lo trae: use un celular Android real.</string>
+    <string name="bt_apagado">Active el Bluetooth del celular e intente de nuevo.</string>
+    <string name="bt_sin_emparejados">No hay equipos emparejados</string>
+    <string name="bt_ayuda">1. Empareje el portátil con este celular desde los ajustes de Bluetooth.
+2. En Windows: Más opciones de Bluetooth > Puertos COM > Agregar > Entrante, y anote el puerto (por ejemplo COM5).
+3. En el portátil ejecute: python -m mirs.servidor --bluetooth COM5</string>
+    <string name="bt_permiso">Sin el permiso de dispositivos cercanos la app no puede conectarse por Bluetooth.</string>
+    <string name="bt_conectando">Conectando por Bluetooth con %1$s…</string>
     <string name="nueva_alerta">Nueva alerta: %1$s</string>
     <string name="mayor_consumo">Mayor consumo</string>
     <string name="buscar_proceso">Buscar por nombre o PID</string>

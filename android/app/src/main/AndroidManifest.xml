@@ -5,6 +5,12 @@
     <!-- vibración corta cuando llega una alerta nueva -->
     <uses-permission android:name="android.permission.VIBRATE" />
 
+    <!-- Bluetooth: conexión directa con el portátil por RFCOMM (puerto serie) -->
+    <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-feature android:name="android.hardware.bluetooth" android:required="false" />
+
     <!-- usesCleartextTraffic: el servidor de MIRS corre en la red local por HTTP, no HTTPS -->
     <application
         android:allowBackup="false"

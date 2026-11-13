@@ -12,7 +12,7 @@ import java.nio.charset.StandardCharsets;
  * Cliente HTTP mínimo para la API del servidor de MIRS en el PC.
  * Se llama siempre desde un hilo en segundo plano: Android prohíbe la red en el hilo principal.
  */
-public final class ApiCliente {
+public final class ApiCliente implements ConexionMirs {
 
     private final String base;
 
@@ -24,14 +24,17 @@ public final class ApiCliente {
         this.base = limpia;
     }
 
+    @Override
     public String getBase() {
         return base;
     }
 
+    @Override
     public String get(String ruta) throws IOException {
         return pedir("GET", ruta, null);
     }
 
+    @Override
     public String post(String ruta, String json) throws IOException {
         return pedir("POST", ruta, json);
     }

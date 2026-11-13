@@ -1,6 +1,13 @@
 package com.umb.mirs;
 
+import android.Manifest;
 import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothManager;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.animation.ValueAnimator;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
@@ -27,6 +34,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -41,6 +50,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -62,7 +72,9 @@ public class MainActivity extends AppCompatActivity {
 
     private final ExecutorService red = Executors.newSingleThreadExecutor();
     private final Handler principal = new Handler(Looper.getMainLooper());
-    private ApiCliente api;
+    private static final String PREFIJO_BLUETOOTH = "bt:";
+
+    private ConexionMirs api;
     private boolean consultando = false;
     private int pestana = R.id.nav_panel;
     private boolean soloActivas = true;
@@ -88,6 +100,16 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout listaMayorConsumo;
 
     private final ProcesoAdapter procesosAdapter = new ProcesoAdapter();
+
+    /** Android 12 o superior pide en tiempo de ejecución el permiso de dispositivos cercanos. */
+    private final ActivityResultLauncher<String> permisoBluetooth =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), concedido -> {
+                if (concedido) {
+                    elegirEquipoBluetooth();
+                } else {
+                    Toast.makeText(this, R.string.bt_permiso, Toast.LENGTH_LONG).show();
+                }
+            });
     private AlertaAdapter alertasAdapter;
 
     private final Runnable ciclo = new Runnable() {
@@ -104,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         SharedPreferences prefs = getSharedPreferences(PREFERENCIAS, MODE_PRIVATE);
-        api = new ApiCliente(prefs.getString(CLAVE_SERVIDOR, SERVIDOR_POR_DEFECTO));
+        api = conexionGuardada(prefs.getString(CLAVE_SERVIDOR, SERVIDOR_POR_DEFECTO));
 
         // encabezado: "MIRS" en blanco y "Móvil" en azul
         TextView titulo = findViewById(R.id.titulo);
@@ -117,6 +139,7 @@ public class MainActivity extends AppCompatActivity {
         puntoVivo = findViewById(R.id.punto_vivo);
         estadoConexion = findViewById(R.id.estado_conexion);
         findViewById(R.id.btn_buscar).setOnClickListener(v -> buscarEquipos());
+        findViewById(R.id.btn_bluetooth).setOnClickListener(v -> conectarPorBluetooth());
         findViewById(R.id.btn_servidor).setOnClickListener(v -> dialogoServidor());
 
         // el punto de "EN VIVO" late
@@ -130,6 +153,7 @@ public class MainActivity extends AppCompatActivity {
         textoSinConexion = findViewById(R.id.texto_sin_conexion);
         findViewById(R.id.btn_reintentar).setOnClickListener(v -> actualizar());
         findViewById(R.id.btn_buscar_equipos).setOnClickListener(v -> buscarEquipos());
+        findViewById(R.id.btn_conectar_bt).setOnClickListener(v -> conectarPorBluetooth());
 
         vistaPanel = findViewById(R.id.vista_panel);
         vistaProcesos = findViewById(R.id.vista_procesos);
@@ -221,6 +245,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         red.shutdownNow();
+        api.cerrar();
     }
 
     private int color(int id) {
@@ -259,7 +284,7 @@ public class MainActivity extends AppCompatActivity {
         consultando = true;
         final int tab = pestana;
         final boolean activas = soloActivas;
-        final ApiCliente cliente = api;
+        final ConexionMirs cliente = api;
         red.execute(() -> {
             try {
                 JSONObject estado = new JSONObject(cliente.get("/api/estado"));
@@ -315,7 +340,8 @@ public class MainActivity extends AppCompatActivity {
         JSONObject muestra = estado.optJSONObject("muestra");
         if (equipo != null) {
             subtitulo.setText(equipo.optString("nombre_host") + " · " + equipo.optString("sistema_operativo")
-                    + " · " + equipo.optInt("nucleos_cpu") + " núcleos");
+                    + " · " + equipo.optInt("nucleos_cpu") + " núcleos"
+                    + (api instanceof ClienteBluetooth ? " · Bluetooth" : ""));
         }
 
         int activas = alertasActivas.length();
@@ -495,7 +521,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void cambiarEstadoAlerta(int idAlerta, String nuevoEstado) {
-        final ApiCliente cliente = api;
+        final ConexionMirs cliente = api;
         red.execute(() -> {
             try {
                 String cuerpo = new JSONObject().put("estado", nuevoEstado).toString();
@@ -549,7 +575,7 @@ public class MainActivity extends AppCompatActivity {
                         .setTitle(R.string.equipos_encontrados)
                         .setItems(etiquetas, (d, i) -> {
                             DescubridorEquipos.Equipo elegido = equipos.get(i);
-                            usarServidor(elegido.url);
+                            usarConexion(new ApiCliente(elegido.url), elegido.url);
                             Toast.makeText(this, getString(R.string.conectado_a, elegido.nombre),
                                     Toast.LENGTH_SHORT).show();
                         })
@@ -559,9 +585,12 @@ public class MainActivity extends AppCompatActivity {
         }, "mirs-busqueda").start();
     }
 
-    private void usarServidor(String url) {
-        getSharedPreferences(PREFERENCIAS, MODE_PRIVATE).edit().putString(CLAVE_SERVIDOR, url).apply();
-        api = new ApiCliente(url);
+    /** Cambia a otra conexión (red o Bluetooth) y la recuerda para la próxima vez. */
+    private void usarConexion(ConexionMirs nueva, String clave) {
+        getSharedPreferences(PREFERENCIAS, MODE_PRIVATE).edit().putString(CLAVE_SERVIDOR, clave).apply();
+        final ConexionMirs anterior = api;
+        red.execute(anterior::cerrar);  // se cierra en el hilo de red, después de la consulta en curso
+        api = nueva;
         estadoConexion.setText(R.string.pastilla_conectando);
         fallosSeguidos = 0;
         ultimaAlertaVista = -1;
@@ -571,7 +600,7 @@ public class MainActivity extends AppCompatActivity {
     private void dialogoServidor() {
         EditText campo = new EditText(this);
         campo.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
-        campo.setText(api.getBase());
+        campo.setText(api instanceof ApiCliente ? api.getBase() : "http://");
         FrameLayout contenedor = new FrameLayout(this);
         int margen = Math.round(20 * getResources().getDisplayMetrics().density);
         contenedor.setPadding(margen, 0, margen, 0);
@@ -586,8 +615,100 @@ public class MainActivity extends AppCompatActivity {
                     if (!url.startsWith("http://") && !url.startsWith("https://")) {
                         url = "http://" + url;
                     }
-                    usarServidor(url);
+                    usarConexion(new ApiCliente(url), url);
                 })
+                .setNegativeButton(R.string.cancelar, null)
+                .show();
+    }
+
+    /** Recrea la última conexión usada: "bt:MAC" para Bluetooth o una URL para la red. */
+    @SuppressLint("MissingPermission")
+    private ConexionMirs conexionGuardada(String clave) {
+        if (clave.startsWith(PREFIJO_BLUETOOTH)) {
+            BluetoothAdapter adaptador = adaptadorBluetooth();
+            if (adaptador != null && tienePermisoBluetooth()) {
+                try {
+                    BluetoothDevice equipo = adaptador.getRemoteDevice(clave.substring(PREFIJO_BLUETOOTH.length()));
+                    return new ClienteBluetooth(equipo, nombreEquipo(equipo));
+                } catch (IllegalArgumentException direccionInvalida) {
+                    // se usa la red por defecto
+                }
+            }
+            return new ApiCliente(SERVIDOR_POR_DEFECTO);
+        }
+        return new ApiCliente(clave);
+    }
+
+    private BluetoothAdapter adaptadorBluetooth() {
+        BluetoothManager gestor = (BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
+        return gestor == null ? null : gestor.getAdapter();
+    }
+
+    private boolean tienePermisoBluetooth() {
+        return Build.VERSION.SDK_INT < Build.VERSION_CODES.S
+                || ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT)
+                == PackageManager.PERMISSION_GRANTED;
+    }
+
+    @SuppressLint("MissingPermission")
+    private static String nombreEquipo(BluetoothDevice equipo) {
+        String nombre = equipo.getName();
+        return nombre == null || nombre.isEmpty() ? equipo.getAddress() : nombre;
+    }
+
+    private void conectarPorBluetooth() {
+        if (adaptadorBluetooth() == null) {
+            new MaterialAlertDialogBuilder(this)
+                    .setTitle(R.string.menu_bluetooth)
+                    .setMessage(R.string.bt_sin_adaptador)
+                    .setPositiveButton(R.string.cerrar, null)
+                    .show();
+            return;
+        }
+        if (tienePermisoBluetooth()) {
+            elegirEquipoBluetooth();
+        } else {
+            permisoBluetooth.launch(Manifest.permission.BLUETOOTH_CONNECT);
+        }
+    }
+
+    /** Muestra los equipos ya emparejados con el celular; no hace falta buscar ni escanear. */
+    @SuppressLint("MissingPermission")
+    private void elegirEquipoBluetooth() {
+        BluetoothAdapter adaptador = adaptadorBluetooth();
+        if (adaptador == null) {
+            return;
+        }
+        if (!adaptador.isEnabled()) {
+            Toast.makeText(this, R.string.bt_apagado, Toast.LENGTH_LONG).show();
+            return;
+        }
+        List<BluetoothDevice> equipos = new ArrayList<>(adaptador.getBondedDevices());
+        if (equipos.isEmpty()) {
+            new MaterialAlertDialogBuilder(this)
+                    .setTitle(R.string.bt_sin_emparejados)
+                    .setMessage(R.string.bt_ayuda)
+                    .setPositiveButton(R.string.cerrar, null)
+                    .show();
+            return;
+        }
+        String[] etiquetas = new String[equipos.size()];
+        for (int i = 0; i < equipos.size(); i++) {
+            etiquetas[i] = nombreEquipo(equipos.get(i)) + "\n" + equipos.get(i).getAddress();
+        }
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.bt_elegir)
+                .setItems(etiquetas, (d, i) -> {
+                    BluetoothDevice equipo = equipos.get(i);
+                    String nombre = nombreEquipo(equipo);
+                    Toast.makeText(this, getString(R.string.bt_conectando, nombre), Toast.LENGTH_SHORT).show();
+                    usarConexion(new ClienteBluetooth(equipo, nombre), PREFIJO_BLUETOOTH + equipo.getAddress());
+                })
+                .setNeutralButton(R.string.ayuda, (d, b) -> new MaterialAlertDialogBuilder(this)
+                        .setTitle(R.string.menu_bluetooth)
+                        .setMessage(R.string.bt_ayuda)
+                        .setPositiveButton(R.string.cerrar, null)
+                        .show())
                 .setNegativeButton(R.string.cancelar, null)
                 .show();
     }
