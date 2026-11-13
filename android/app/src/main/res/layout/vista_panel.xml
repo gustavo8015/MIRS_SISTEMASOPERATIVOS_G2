@@ -31,15 +31,15 @@
                 <com.umb.mirs.Chip3DView
                     android:id="@+id/chip"
                     android:layout_width="210dp"
-                    android:layout_height="150dp"
+                    android:layout_height="132dp"
                     android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="34dp" />
+                    android:layout_marginTop="36dp" />
 
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal|bottom"
-                    android:layout_marginBottom="16dp"
+                    android:layout_marginBottom="36dp"
                     android:gravity="center_horizontal"
                     android:orientation="vertical">
 
