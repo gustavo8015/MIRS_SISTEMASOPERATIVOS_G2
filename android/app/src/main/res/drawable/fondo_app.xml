@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Fondo de la ventana: degradado azul noche, más claro arriba -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <gradient
+        android:angle="270"
+        android:centerColor="#0A0F1E"
+        android:endColor="#070A14"
+        android:startColor="#14224A" />
+</shape>

@@ -1,24 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.MIRS" parent="Theme.Material3.Light.NoActionBar">
-        <item name="colorPrimary">@color/primario</item>
-        <item name="colorOnPrimary">#FFFFFF</item>
+    <style name="Theme.MIRS" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/azul_claro</item>
+        <item name="colorOnPrimary">#0B1220</item>
+        <item name="colorPrimaryContainer">#1E3A8A</item>
+        <item name="colorOnPrimaryContainer">#DBEAFE</item>
         <item name="colorSecondary">@color/acento</item>
+        <item name="colorSecondaryContainer">#1E3A8A</item>
+        <item name="colorOnSecondaryContainer">#DBEAFE</item>
         <item name="colorError">@color/peligro</item>
+        <item name="colorSurface">#111827</item>
+        <item name="colorOnSurface">@color/texto</item>
+        <item name="colorOutline">@color/borde</item>
         <item name="android:colorBackground">@color/fondo</item>
-        <item name="android:statusBarColor">@color/primario_oscuro</item>
+        <item name="android:windowBackground">@drawable/fondo_app</item>
+        <item name="android:statusBarColor">@color/fondo_arriba</item>
+        <item name="android:navigationBarColor">@color/primario_oscuro</item>
+        <item name="android:windowLightStatusBar">false</item>
     </style>
 
     <style name="TarjetaMIRS" parent="Widget.Material3.CardView.Outlined">
-        <item name="cardBackgroundColor">@color/tarjeta</item>
-        <item name="strokeColor">@color/borde</item>
-        <item name="cardCornerRadius">10dp</item>
+        <item name="cardBackgroundColor">@color/vidrio</item>
+        <item name="strokeColor">@color/vidrio_borde</item>
+        <item name="cardCornerRadius">18dp</item>
     </style>
 
     <style name="TituloTarjeta">
-        <item name="android:textSize">14sp</item>
+        <item name="android:textSize">13sp</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:textColor">@color/texto_suave</item>
+        <item name="android:textColor">#CBD5E1</item>
     </style>
 
     <style name="Etiqueta">
@@ -28,5 +38,41 @@
         <item name="android:paddingEnd">8dp</item>
         <item name="android:paddingTop">2dp</item>
         <item name="android:paddingBottom">2dp</item>
+    </style>
+
+    <style name="TarjetaVidrio">
+        <item name="android:background">@drawable/fondo_tarjeta</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:padding">14dp</item>
+        <item name="android:layout_marginBottom">10dp</item>
+    </style>
+
+    <style name="ColumnaAnillo">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:gravity">center_horizontal</item>
+        <item name="android:orientation">vertical</item>
+    </style>
+
+    <style name="AnilloPequeno">
+        <item name="android:layout_width">88dp</item>
+        <item name="android:layout_height">88dp</item>
+    </style>
+
+    <style name="TituloAnillo">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/texto</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="DetalleAnillo">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/texto_suave</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:gravity">center</item>
     </style>
 </resources>

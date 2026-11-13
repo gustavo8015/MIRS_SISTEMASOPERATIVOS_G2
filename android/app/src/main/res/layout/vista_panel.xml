@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Pestaña Panel: indicadores, gráfica, alerta activa y procesos de mayor consumo -->
+<!-- Pestaña Panel: chip 3D con el uso de CPU, anillos, alerta, gráfica, núcleos y procesos -->
 <androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/refrescar_panel"
     android:layout_width="match_parent"
@@ -7,295 +7,122 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="96dp">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="8dp">
-
-    <GridLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:columnCount="2">
-
-        <com.google.android.material.card.MaterialCardView
-            style="@style/TarjetaMIRS"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_columnWeight="1"
-            android:layout_margin="4dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="12dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        style="@style/TituloTarjeta"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/cpu" />
-
-                    <TextView
-                        android:id="@+id/cpu_etiqueta"
-                        style="@style/Etiqueta"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/fondo_etiqueta"
-                        android:text="-" />
-                </LinearLayout>
-
-                <TextView
-                    android:id="@+id/cpu_valor"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="-"
-                    android:textColor="@color/texto"
-                    android:textSize="26sp"
-                    android:textStyle="bold" />
-
-                <ProgressBar
-                    android:id="@+id/cpu_barra"
-                    style="?android:attr/progressBarStyleHorizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="8dp"
-                    android:layout_marginTop="4dp"
-                    android:max="100"
-                    android:progress="0" />
-                <TextView
-                    android:id="@+id/cpu_detalle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:textColor="@color/texto_suave"
-                    android:textSize="12sp" />
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <com.google.android.material.card.MaterialCardView
-            style="@style/TarjetaMIRS"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_columnWeight="1"
-            android:layout_margin="4dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="12dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        style="@style/TituloTarjeta"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/ram" />
-
-                    <TextView
-                        android:id="@+id/ram_etiqueta"
-                        style="@style/Etiqueta"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/fondo_etiqueta"
-                        android:text="-" />
-                </LinearLayout>
-
-                <TextView
-                    android:id="@+id/ram_valor"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="-"
-                    android:textColor="@color/texto"
-                    android:textSize="26sp"
-                    android:textStyle="bold" />
-
-                <ProgressBar
-                    android:id="@+id/ram_barra"
-                    style="?android:attr/progressBarStyleHorizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="8dp"
-                    android:layout_marginTop="4dp"
-                    android:max="100"
-                    android:progress="0" />
-                <TextView
-                    android:id="@+id/ram_detalle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:textColor="@color/texto_suave"
-                    android:textSize="12sp" />
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <com.google.android.material.card.MaterialCardView
-            style="@style/TarjetaMIRS"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_columnWeight="1"
-            android:layout_margin="4dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="12dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        style="@style/TituloTarjeta"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/disco" />
-
-                    <TextView
-                        android:id="@+id/disco_etiqueta"
-                        style="@style/Etiqueta"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/fondo_etiqueta"
-                        android:text="-" />
-                </LinearLayout>
-
-                <TextView
-                    android:id="@+id/disco_valor"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="-"
-                    android:textColor="@color/texto"
-                    android:textSize="26sp"
-                    android:textStyle="bold" />
-
-                <ProgressBar
-                    android:id="@+id/disco_barra"
-                    style="?android:attr/progressBarStyleHorizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="8dp"
-                    android:layout_marginTop="4dp"
-                    android:max="100"
-                    android:progress="0" />
-                <TextView
-                    android:id="@+id/disco_detalle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:textColor="@color/texto_suave"
-                    android:textSize="12sp" />
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <com.google.android.material.card.MaterialCardView
-            style="@style/TarjetaMIRS"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_columnWeight="1"
-            android:layout_margin="4dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="12dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        style="@style/TituloTarjeta"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/red" />
-
-                    <TextView
-                        android:id="@+id/red_etiqueta"
-                        style="@style/Etiqueta"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/fondo_etiqueta"
-                        android:text="-" />
-                </LinearLayout>
-
-                <TextView
-                    android:id="@+id/red_valor"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="-"
-                    android:textColor="@color/texto"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/red_detalle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:textColor="@color/texto_suave"
-                    android:textSize="12sp" />
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-    </GridLayout>
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/banner_alerta"
-            style="@style/TarjetaMIRS"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="4dp"
-            android:visibility="gone"
-            app:cardBackgroundColor="@color/fondo_peligro"
-            app:strokeColor="@color/peligro"
-            xmlns:app="http://schemas.android.com/apk/res-auto">
+            android:orientation="vertical"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp">
 
-            <TextView
-                android:id="@+id/texto_banner"
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="12dp"
-                android:textColor="@color/texto_peligro"
-                android:textSize="13sp" />
-        </com.google.android.material.card.MaterialCardView>
+                android:layout_height="270dp">
 
-        <com.google.android.material.card.MaterialCardView
-            style="@style/TarjetaMIRS"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="4dp">
+                <com.umb.mirs.AnilloView
+                    android:id="@+id/anillo_cpu"
+                    android:layout_width="250dp"
+                    android:layout_height="250dp"
+                    android:layout_gravity="center" />
+
+                <com.umb.mirs.Chip3DView
+                    android:id="@+id/chip"
+                    android:layout_width="210dp"
+                    android:layout_height="150dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="34dp" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal|bottom"
+                    android:layout_marginBottom="16dp"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/cpu_valor"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:shadowColor="#80000000"
+                        android:shadowRadius="8"
+                        android:text="-"
+                        android:textColor="@color/texto"
+                        android:textSize="40sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/cpu_estado"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:letterSpacing="0.15"
+                        android:text="CPU"
+                        android:textColor="@color/texto_suave"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </FrameLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="12dp">
+                android:layout_marginBottom="10dp"
+                android:orientation="horizontal">
+
+                <LinearLayout style="@style/ColumnaAnillo">
+                    <com.umb.mirs.AnilloView android:id="@+id/anillo_ram" style="@style/AnilloPequeno" />
+                    <TextView style="@style/TituloAnillo" android:text="@string/ram" />
+                    <TextView android:id="@+id/ram_detalle" style="@style/DetalleAnillo" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/ColumnaAnillo">
+                    <com.umb.mirs.AnilloView android:id="@+id/anillo_disco" style="@style/AnilloPequeno" />
+                    <TextView style="@style/TituloAnillo" android:text="@string/disco" />
+                    <TextView android:id="@+id/disco_detalle" style="@style/DetalleAnillo" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/ColumnaAnillo">
+                    <com.umb.mirs.AnilloView android:id="@+id/anillo_red" style="@style/AnilloPequeno" />
+                    <TextView style="@style/TituloAnillo" android:text="@string/red" />
+                    <TextView android:id="@+id/red_detalle" style="@style/DetalleAnillo" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/banner_alerta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/fondo_alerta"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="10dp"
+                android:visibility="gone">
+
+                <com.umb.mirs.PulsoView
+                    android:id="@+id/pulso"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp" />
+
+                <TextView
+                    android:id="@+id/texto_banner"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_weight="1"
+                    android:textColor="@color/texto_peligro"
+                    android:textSize="13sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                style="@style/TarjetaVidrio"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -307,35 +134,68 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="@string/uso_reciente" />
+                        android:text="@string/uso_en_vivo" />
 
                     <TextView
                         android:id="@+id/leyenda"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="@color/texto_suave"
-                        android:textSize="12sp" />
+                        android:textColor="@color/texto_tenue"
+                        android:textSize="11.5sp" />
                 </LinearLayout>
 
                 <com.umb.mirs.GraficaLineas
                     android:id="@+id/grafica"
                     android:layout_width="match_parent"
-                    android:layout_height="200dp"
+                    android:layout_height="170dp"
                     android:layout_marginTop="8dp" />
             </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <com.google.android.material.card.MaterialCardView
-            style="@style/TarjetaMIRS"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="4dp">
 
             <LinearLayout
+                style="@style/TarjetaVidrio"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="12dp">
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        style="@style/TituloTarjeta"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/nucleos_logicos" />
+
+                    <TextView
+                        android:id="@+id/nucleos_total"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/texto_tenue"
+                        android:textSize="11.5sp" />
+                </LinearLayout>
+
+                <com.umb.mirs.MapaNucleosView
+                    android:id="@+id/mapa_nucleos"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:id="@+id/nucleos_aviso"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/nucleos_aviso"
+                    android:textColor="@color/texto_suave"
+                    android:textSize="12sp"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <LinearLayout
+                style="@style/TarjetaVidrio"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
                 <TextView
                     style="@style/TituloTarjeta"
@@ -347,10 +207,9 @@
                     android:id="@+id/lista_mayor_consumo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
+                    android:layout_marginTop="4dp"
                     android:orientation="vertical" />
             </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-    </LinearLayout>
+        </LinearLayout>
     </ScrollView>
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

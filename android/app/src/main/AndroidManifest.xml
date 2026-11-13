@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- vibración corta cuando llega una alerta nueva -->
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <!-- usesCleartextTraffic: el servidor de MIRS corre en la red local por HTTP, no HTTPS -->
     <application

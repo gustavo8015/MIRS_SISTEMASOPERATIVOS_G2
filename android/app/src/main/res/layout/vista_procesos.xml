@@ -27,18 +27,19 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/pista"
         android:orientation="horizontal"
-        android:padding="8dp">
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="6dp">
 
         <TextView android:layout_width="56dp" android:layout_height="wrap_content"
-            android:text="PID" android:textStyle="bold" android:textSize="12sp" />
+            android:text="PID" android:textStyle="bold" android:textSize="12sp" android:textColor="@color/texto_suave" />
         <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-            android:text="Proceso" android:textStyle="bold" android:textSize="12sp" />
+            android:text="Proceso" android:textStyle="bold" android:textSize="12sp" android:textColor="@color/texto_suave" />
         <TextView android:layout_width="56dp" android:layout_height="wrap_content" android:gravity="end"
-            android:text="CPU %" android:textStyle="bold" android:textSize="12sp" />
+            android:text="CPU %" android:textStyle="bold" android:textSize="12sp" android:textColor="@color/texto_suave" />
         <TextView android:layout_width="72dp" android:layout_height="wrap_content" android:gravity="end"
-            android:text="RAM MB" android:textStyle="bold" android:textSize="12sp" />
+            android:text="RAM MB" android:textStyle="bold" android:textSize="12sp" android:textColor="@color/texto_suave" />
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
@@ -46,5 +47,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:background="@color/tarjeta" />
+        android:background="@drawable/fondo_tarjeta"
+        android:clipToPadding="false"
+        android:paddingBottom="96dp" />
 </LinearLayout>

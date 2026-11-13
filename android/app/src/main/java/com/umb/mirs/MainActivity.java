@@ -1,20 +1,29 @@
 package com.umb.mirs;
 
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.text.Editable;
 import android.text.InputType;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.TextWatcher;
+import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.LinearLayout.LayoutParams;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,11 +33,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButtonToggleGroup;
-import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.json.JSONArray;
@@ -59,16 +66,27 @@ public class MainActivity extends AppCompatActivity {
     private boolean consultando = false;
     private int pestana = R.id.nav_panel;
     private boolean soloActivas = true;
+    private int fallosSeguidos = 0;
+    private int ultimaAlertaVista = -1;
+    private float cpuEnPantalla = 0f;
+    private double maximoRed = 100;
 
-    private MaterialToolbar barra;
-    private TextView estadoConexion;
+    private TextView subtitulo, estadoConexion, textoSinConexion;
+    private View pastilla, puntoVivo, vistaSinConexion;
     private View vistaPanel, vistaProcesos, vistaAlertas;
     private BottomNavigationView navegacion;
     private SwipeRefreshLayout refrescar;
+
+    private AnilloView anilloCpu, anilloRam, anilloDisco, anilloRed;
+    private Chip3DView chip;
+    private TextView cpuValor, cpuEstado, ramDetalle, discoDetalle, redDetalle;
+    private View banner;
+    private PulsoView pulso;
+    private TextView textoBanner, leyenda, nucleosTotal, nucleosAviso, sinAlertas;
     private GraficaLineas grafica;
-    private TextView leyenda, textoBanner, sinAlertas;
-    private MaterialCardView banner;
+    private MapaNucleosView mapaNucleos;
     private LinearLayout listaMayorConsumo;
+
     private final ProcesoAdapter procesosAdapter = new ProcesoAdapter();
     private AlertaAdapter alertasAdapter;
 
@@ -88,31 +106,61 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences(PREFERENCIAS, MODE_PRIVATE);
         api = new ApiCliente(prefs.getString(CLAVE_SERVIDOR, SERVIDOR_POR_DEFECTO));
 
-        barra = findViewById(R.id.barra);
-        barra.inflateMenu(R.menu.barra);
-        barra.setOnMenuItemClickListener(item -> {
-            if (item.getItemId() == R.id.accion_servidor) {
-                dialogoServidor();
-                return true;
-            }
-            if (item.getItemId() == R.id.accion_buscar) {
-                buscarEquipos();
-                return true;
-            }
-            return false;
-        });
-
+        // encabezado: "MIRS" en blanco y "Móvil" en azul
+        TextView titulo = findViewById(R.id.titulo);
+        SpannableString nombre = new SpannableString(getString(R.string.app_name));
+        nombre.setSpan(new ForegroundColorSpan(color(R.color.azul_claro)), 5, nombre.length(),
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        titulo.setText(nombre);
+        subtitulo = findViewById(R.id.subtitulo);
+        pastilla = findViewById(R.id.pastilla_estado);
+        puntoVivo = findViewById(R.id.punto_vivo);
         estadoConexion = findViewById(R.id.estado_conexion);
+        findViewById(R.id.btn_buscar).setOnClickListener(v -> buscarEquipos());
+        findViewById(R.id.btn_servidor).setOnClickListener(v -> dialogoServidor());
+
+        // el punto de "EN VIVO" late
+        ObjectAnimator latido = ObjectAnimator.ofFloat(puntoVivo, "alpha", 1f, 0.25f);
+        latido.setDuration(800);
+        latido.setRepeatCount(ValueAnimator.INFINITE);
+        latido.setRepeatMode(ValueAnimator.REVERSE);
+        latido.start();
+
+        vistaSinConexion = findViewById(R.id.vista_sin_conexion);
+        textoSinConexion = findViewById(R.id.texto_sin_conexion);
+        findViewById(R.id.btn_reintentar).setOnClickListener(v -> actualizar());
+        findViewById(R.id.btn_buscar_equipos).setOnClickListener(v -> buscarEquipos());
+
         vistaPanel = findViewById(R.id.vista_panel);
         vistaProcesos = findViewById(R.id.vista_procesos);
         vistaAlertas = findViewById(R.id.vista_alertas);
         // El <include> de activity_main le da a la raíz de vista_panel el id vista_panel,
         // así que el SwipeRefreshLayout se busca con ese id (refrescar_panel deja de existir).
         refrescar = findViewById(R.id.vista_panel);
+        refrescar.setOnRefreshListener(this::actualizar);
+        refrescar.setProgressBackgroundColorSchemeColor(color(R.color.tarjeta));
+        refrescar.setColorSchemeColors(color(R.color.azul_claro));
+
+        anilloCpu = findViewById(R.id.anillo_cpu);
+        anilloCpu.setGrosor(10);
+        anilloCpu.setMostrarTexto(false);
+        anilloRam = findViewById(R.id.anillo_ram);
+        anilloDisco = findViewById(R.id.anillo_disco);
+        anilloRed = findViewById(R.id.anillo_red);
+        chip = findViewById(R.id.chip);
+        cpuValor = findViewById(R.id.cpu_valor);
+        cpuEstado = findViewById(R.id.cpu_estado);
+        ramDetalle = findViewById(R.id.ram_detalle);
+        discoDetalle = findViewById(R.id.disco_detalle);
+        redDetalle = findViewById(R.id.red_detalle);
+        banner = findViewById(R.id.banner_alerta);
+        pulso = findViewById(R.id.pulso);
+        textoBanner = findViewById(R.id.texto_banner);
         grafica = findViewById(R.id.grafica);
         leyenda = findViewById(R.id.leyenda);
-        banner = findViewById(R.id.banner_alerta);
-        textoBanner = findViewById(R.id.texto_banner);
+        mapaNucleos = findViewById(R.id.mapa_nucleos);
+        nucleosTotal = findViewById(R.id.nucleos_total);
+        nucleosAviso = findViewById(R.id.nucleos_aviso);
         listaMayorConsumo = findViewById(R.id.lista_mayor_consumo);
         sinAlertas = findViewById(R.id.sin_alertas);
 
@@ -121,8 +169,6 @@ public class MainActivity extends AppCompatActivity {
             mostrarPestana(item.getItemId());
             return true;
         });
-
-        refrescar.setOnRefreshListener(this::actualizar);
         banner.setOnClickListener(v -> navegacion.setSelectedItemId(R.id.nav_alertas));
 
         RecyclerView listaProcesos = findViewById(R.id.lista_procesos);
@@ -177,12 +223,32 @@ public class MainActivity extends AppCompatActivity {
         red.shutdownNow();
     }
 
+    private int color(int id) {
+        return ContextCompat.getColor(this, id);
+    }
+
+    /** Cambio de pestaña con una transición corta: la nueva vista entra deslizándose. */
     private void mostrarPestana(int id) {
+        int anterior = indice(pestana), nuevo = indice(id);
         pestana = id;
-        vistaPanel.setVisibility(id == R.id.nav_panel ? View.VISIBLE : View.GONE);
-        vistaProcesos.setVisibility(id == R.id.nav_procesos ? View.VISIBLE : View.GONE);
-        vistaAlertas.setVisibility(id == R.id.nav_alertas ? View.VISIBLE : View.GONE);
+        View[] vistas = {vistaPanel, vistaProcesos, vistaAlertas};
+        for (int i = 0; i < vistas.length; i++) {
+            vistas[i].setVisibility(i == nuevo ? View.VISIBLE : View.GONE);
+        }
+        View entra = vistas[nuevo];
+        float d = getResources().getDisplayMetrics().density;
+        entra.setAlpha(0f);
+        entra.setTranslationX((nuevo >= anterior ? 1 : -1) * 36 * d);
+        entra.animate().alpha(1f).translationX(0f).setDuration(240)
+                .setInterpolator(new DecelerateInterpolator()).start();
         actualizar();
+    }
+
+    private static int indice(int idPestana) {
+        if (idPestana == R.id.nav_procesos) {
+            return 1;
+        }
+        return idPestana == R.id.nav_alertas ? 2 : 0;
     }
 
     /** Pide a la API lo que necesita la pestaña visible. Nunca hay dos consultas a la vez. */
@@ -210,17 +276,37 @@ public class MainActivity extends AppCompatActivity {
                 principal.post(() -> {
                     consultando = false;
                     refrescar.setRefreshing(false);
+                    conectado(true, cliente.getBase());
                     pintar(estado, alertasActivas, muestras, umbrales, procesos, alertas);
                 });
             } catch (Exception e) {
                 principal.post(() -> {
                     consultando = false;
                     refrescar.setRefreshing(false);
-                    estadoConexion.setText(getString(R.string.sin_conexion, cliente.getBase()));
-                    estadoConexion.setTextColor(ContextCompat.getColor(this, R.color.peligro));
+                    conectado(false, cliente.getBase());
                 });
             }
         });
+    }
+
+    /** Pastilla "EN VIVO" / "SIN CONEXIÓN" y pantalla de sin conexión tras dos fallos seguidos. */
+    private void conectado(boolean si, String base) {
+        fallosSeguidos = si ? 0 : fallosSeguidos + 1;
+        int tono = si ? R.color.exito : R.color.peligro;
+        estadoConexion.setText(si ? R.string.pastilla_vivo : R.string.pastilla_sin_conexion);
+        estadoConexion.setTextColor(si ? 0xFF86EFAC : color(R.color.texto_peligro));
+        puntoVivo.setBackgroundTintList(ColorStateList.valueOf(color(tono)));
+        pastilla.setBackgroundTintList(si ? null : ColorStateList.valueOf(0x33EF4444));
+
+        if (si && vistaSinConexion.getVisibility() == View.VISIBLE) {
+            vistaSinConexion.animate().alpha(0f).setDuration(250)
+                    .withEndAction(() -> vistaSinConexion.setVisibility(View.GONE)).start();
+        } else if (!si && fallosSeguidos >= 2 && vistaSinConexion.getVisibility() != View.VISIBLE) {
+            textoSinConexion.setText(getString(R.string.sin_conexion_detalle, base));
+            vistaSinConexion.setAlpha(0f);
+            vistaSinConexion.setVisibility(View.VISIBLE);
+            vistaSinConexion.animate().alpha(1f).setDuration(250).start();
+        }
     }
 
     private void pintar(JSONObject estado, JSONArray alertasActivas, JSONArray muestras,
@@ -228,23 +314,21 @@ public class MainActivity extends AppCompatActivity {
         JSONObject equipo = estado.optJSONObject("equipo");
         JSONObject muestra = estado.optJSONObject("muestra");
         if (equipo != null) {
-            barra.setSubtitle(equipo.optString("nombre_host") + " · " + equipo.optString("sistema_operativo"));
+            subtitulo.setText(equipo.optString("nombre_host") + " · " + equipo.optString("sistema_operativo")
+                    + " · " + equipo.optInt("nucleos_cpu") + " núcleos");
         }
-        estadoConexion.setTextColor(ContextCompat.getColor(this, R.color.texto_suave));
-        estadoConexion.setText(muestra == null
-                ? getString(R.string.conectando)
-                : getString(R.string.conectado, Formato.hora(muestra.optString("fecha_hora"))));
 
         int activas = alertasActivas.length();
         BadgeDrawable insignia = navegacion.getOrCreateBadge(R.id.nav_alertas);
         insignia.setNumber(activas);
         insignia.setVisible(activas > 0);
+        avisarAlertaNueva(alertasActivas);
 
+        double limCpu = limite(umbrales, "CPU", 85);
         if (muestra != null && equipo != null && umbrales != null) {
             pintarPanel(estado, equipo, muestra, umbrales, alertasActivas);
         }
-        if (muestras != null) {
-            float limiteCpu = (float) limite(umbrales, "CPU", 85);
+        if (muestras != null && muestra != null) {
             float[] cpu = new float[muestras.length()];
             float[] ram = new float[muestras.length()];
             for (int i = 0; i < muestras.length(); i++) {
@@ -252,9 +336,10 @@ public class MainActivity extends AppCompatActivity {
                 cpu[i] = (float) m.optDouble("cpu_pct", 0);
                 ram[i] = (float) m.optDouble("ram_pct", 0);
             }
-            grafica.setDatos(cpu, ram, limiteCpu);
-            double segundos = muestras.length() * estado.optDouble("intervalo_seg", 2);
-            leyenda.setText("CPU azul · RAM naranja · " + Formato.entero(Math.ceil(segundos / 60)) + " min");
+            float intervalo = (float) estado.optDouble("intervalo_seg", 2);
+            int colorCpu = colorEstado(muestra.optDouble("cpu_pct", 0), limCpu, R.color.azul_claro);
+            grafica.setDatos(cpu, ram, (float) limCpu, colorCpu, intervalo);
+            leyenda.setText(leyenda(colorCpu, Math.ceil(muestras.length() * intervalo / 60)));
         }
         if (procesos != null) {
             procesosAdapter.setDatos(procesos);
@@ -263,6 +348,15 @@ public class MainActivity extends AppCompatActivity {
             alertasAdapter.setDatos(alertas);
             sinAlertas.setVisibility(alertas.length() == 0 ? View.VISIBLE : View.GONE);
         }
+    }
+
+    private CharSequence leyenda(int colorCpu, double minutos) {
+        SpannableStringBuilder t = new SpannableStringBuilder();
+        t.append("● ", new ForegroundColorSpan(colorCpu), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        t.append("CPU   ");
+        t.append("● ", new ForegroundColorSpan(color(R.color.acento)), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        t.append("RAM   ").append(Formato.entero(minutos)).append(" min");
+        return t;
     }
 
     private void pintarPanel(JSONObject estado, JSONObject equipo, JSONObject muestra,
@@ -274,19 +368,44 @@ public class MainActivity extends AppCompatActivity {
         double limRam = limite(umbrales, "RAM", 90);
         double limDisco = limite(umbrales, "DISCO", 90);
 
-        indicador(R.id.cpu_valor, R.id.cpu_barra, R.id.cpu_etiqueta, R.id.cpu_detalle, cpu, limCpu, equipo.optInt("nucleos_cpu") + " núcleos · umbral "
-                + Formato.porcentaje(limCpu));
-        double ramTotalGb = equipo.optDouble("ram_total_mb", 0) / 1024.0;
-        indicador(R.id.ram_valor, R.id.ram_barra, R.id.ram_etiqueta, R.id.ram_detalle, ram, limRam, Formato.decimal(ramTotalGb * ram / 100) + " de "
-                + Formato.decimal(ramTotalGb) + " GB");
-        double discoTotal = equipo.optDouble("disco_total_gb", 0);
-        indicador(R.id.disco_valor, R.id.disco_barra, R.id.disco_etiqueta, R.id.disco_detalle, disco, limDisco, Formato.entero(discoTotal * disco / 100) + " de "
-                + Formato.entero(discoTotal) + " GB usados");
+        // CPU: anillo grande, chip 3D y cifra que sube como contador
+        int colorCpu = colorEstado(cpu, limCpu, R.color.azul_claro);
+        anilloCpu.setValor((float) cpu, colorCpu);
+        chip.setEstado((float) cpu, colorCpu);
+        animarCifra(cpuValor, cpuEnPantalla, (float) cpu);
+        cpuEnPantalla = (float) cpu;
+        cpuEstado.setText("CPU · " + nombreEstado(cpu, limCpu));
+        cpuEstado.setTextColor(colorCpu);
 
-        ((TextView) findViewById(R.id.red_valor)).setText("↑ " + Formato.entero(muestra.optDouble("red_envio_kbps", 0))
-                + "  ↓ " + Formato.entero(muestra.optDouble("red_recepcion_kbps", 0)));
-        ((TextView) findViewById(R.id.red_detalle)).setText("kbps de envío y recepción");
-        etiqueta((TextView) findViewById(R.id.red_etiqueta), "Normal", R.color.fondo_exito, R.color.exito);
+        double ramTotalGb = equipo.optDouble("ram_total_mb", 0) / 1024.0;
+        anilloRam.setValor((float) ram, colorEstado(ram, limRam, R.color.exito));
+        ramDetalle.setText(Formato.decimal(ramTotalGb * ram / 100) + " / " + Formato.decimal(ramTotalGb) + " GB");
+
+        double discoTotal = equipo.optDouble("disco_total_gb", 0);
+        anilloDisco.setValor((float) disco, colorEstado(disco, limDisco, R.color.exito));
+        discoDetalle.setText(Formato.entero(discoTotal * disco / 100) + " / " + Formato.entero(discoTotal) + " GB");
+
+        // Red: el anillo se llena respecto al máximo reciente, que decae poco a poco
+        double envio = muestra.optDouble("red_envio_kbps", 0), recepcion = muestra.optDouble("red_recepcion_kbps", 0);
+        double total = envio + recepcion;
+        maximoRed = Math.max(Math.max(100, maximoRed * 0.97), total);
+        anilloRed.setValor((float) (100 * total / maximoRed), color(R.color.primario));
+        anilloRed.setTextoCentro(total >= 1000 ? Formato.decimal(total / 1000) + "M" : Formato.entero(total));
+        redDetalle.setText("↓ " + Formato.entero(recepcion) + " · ↑ " + Formato.entero(envio) + " kbps");
+
+        // Núcleos lógicos
+        JSONArray nucleos = estado.optJSONArray("nucleos");
+        nucleosAviso.setVisibility(estado.has("nucleos") ? View.GONE : View.VISIBLE);
+        if (nucleos != null && nucleos.length() > 0) {
+            float[] usos = new float[nucleos.length()];
+            float suma = 0;
+            for (int i = 0; i < usos.length; i++) {
+                usos[i] = (float) nucleos.optDouble(i, 0);
+                suma += usos[i];
+            }
+            mapaNucleos.setUsos(usos);
+            nucleosTotal.setText(usos.length + " · promedio " + Formato.porcentaje(suma / usos.length));
+        }
 
         listaMayorConsumo.removeAllViews();
         JSONArray procesos = estado.optJSONArray("procesos");
@@ -301,41 +420,65 @@ public class MainActivity extends AppCompatActivity {
 
         if (alertasActivas.length() > 0) {
             JSONObject a = alertasActivas.optJSONObject(0);
-            textoBanner.setText("Alerta " + a.optString("severidad") + ": " + a.optString("mensaje")
-                    + "\nToque para ver las alertas.");
-            banner.setVisibility(View.VISIBLE);
+            boolean alta = "ALTA".equals(a.optString("severidad"));
+            pulso.setColor(color(alta ? R.color.peligro : R.color.acento));
+            SpannableStringBuilder t = new SpannableStringBuilder();
+            t.append(Formato.tipoAlerta(a.optString("tipo")),
+                    new android.text.style.StyleSpan(android.graphics.Typeface.BOLD), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            t.append("\n").append(a.optString("mensaje"));
+            textoBanner.setText(t);
+            if (banner.getVisibility() != View.VISIBLE) {
+                banner.setAlpha(0f);
+                banner.setVisibility(View.VISIBLE);
+                banner.animate().alpha(1f).setDuration(300).start();
+            }
         } else {
             banner.setVisibility(View.GONE);
         }
     }
 
-    /** Valor, barra y etiqueta de texto (Normal, Vigilar, Alerta) de un recurso. */
-    private void indicador(int idValor, int idBarra, int idEtiqueta, int idDetalle,
-                           double valor, double limite, String detalle) {
-        ((TextView) findViewById(idValor)).setText(Formato.porcentaje(valor));
-        ((TextView) findViewById(idDetalle)).setText(detalle);
-        ProgressBar barraRecurso = findViewById(idBarra);
-        barraRecurso.setProgress((int) Math.round(valor));
-        TextView etiqueta = findViewById(idEtiqueta);
-
-        int color;
-        if (valor > limite) {
-            color = R.color.peligro;
-            etiqueta(etiqueta, "Alerta", R.color.fondo_peligro, R.color.texto_peligro);
-        } else if (valor > limite - 15) {
-            color = R.color.acento;
-            etiqueta(etiqueta, "Vigilar", R.color.fondo_aviso, R.color.texto_aviso);
-        } else {
-            color = R.color.exito;
-            etiqueta(etiqueta, "Normal", R.color.fondo_exito, R.color.exito);
+    /** Vibra y avisa cuando aparece una alerta con un id mayor que la última vista. */
+    private void avisarAlertaNueva(JSONArray alertasActivas) {
+        int mayor = 0;
+        String tipo = "";
+        for (int i = 0; i < alertasActivas.length(); i++) {
+            JSONObject a = alertasActivas.optJSONObject(i);
+            if (a != null && a.optInt("id_alerta") > mayor) {
+                mayor = a.optInt("id_alerta");
+                tipo = a.optString("tipo");
+            }
         }
-        barraRecurso.setProgressTintList(ColorStateList.valueOf(ContextCompat.getColor(this, color)));
+        if (ultimaAlertaVista >= 0 && mayor > ultimaAlertaVista) {
+            Vibrator vibrador = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+            if (vibrador != null && vibrador.hasVibrator()) {
+                vibrador.vibrate(VibrationEffect.createOneShot(90, VibrationEffect.DEFAULT_AMPLITUDE));
+            }
+            Toast.makeText(this, getString(R.string.nueva_alerta, Formato.tipoAlerta(tipo)), Toast.LENGTH_SHORT).show();
+        }
+        ultimaAlertaVista = Math.max(ultimaAlertaVista, mayor);
     }
 
-    private void etiqueta(TextView v, String texto, int fondo, int letra) {
-        v.setText(texto);
-        v.setTextColor(ContextCompat.getColor(this, letra));
-        v.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, fondo)));
+    private void animarCifra(TextView vista, float desde, float hasta) {
+        ValueAnimator a = ValueAnimator.ofFloat(desde, hasta);
+        a.setDuration(700);
+        a.setInterpolator(new DecelerateInterpolator());
+        a.addUpdateListener(x -> vista.setText(Formato.porcentaje((float) x.getAnimatedValue())));
+        a.start();
+    }
+
+    /** Verde (o el color base) en uso normal, ámbar al acercarse al umbral y rojo al superarlo. */
+    private int colorEstado(double valor, double limite, int colorNormal) {
+        if (valor > limite) {
+            return color(R.color.peligro);
+        }
+        return valor > limite - 15 ? color(R.color.acento) : color(colorNormal);
+    }
+
+    private static String nombreEstado(double valor, double limite) {
+        if (valor > limite) {
+            return "ALERTA";
+        }
+        return valor > limite - 15 ? "VIGILAR" : "NORMAL";
     }
 
     private static double limite(JSONArray umbrales, String recurso, double porDefecto) {
@@ -419,7 +562,9 @@ public class MainActivity extends AppCompatActivity {
     private void usarServidor(String url) {
         getSharedPreferences(PREFERENCIAS, MODE_PRIVATE).edit().putString(CLAVE_SERVIDOR, url).apply();
         api = new ApiCliente(url);
-        estadoConexion.setText(R.string.conectando);
+        estadoConexion.setText(R.string.pastilla_conectando);
+        fallosSeguidos = 0;
+        ultimaAlertaVista = -1;
         actualizar();
     }
 

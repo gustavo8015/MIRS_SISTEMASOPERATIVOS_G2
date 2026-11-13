@@ -17,10 +17,23 @@
     <string name="sin_conexion">Sin conexión con %1$s. Verifique que el servidor de MIRS esté corriendo.</string>
     <string name="conectado">Conectado · última muestra %1$s</string>
     <string name="cpu">CPU</string>
-    <string name="ram">Memoria RAM</string>
+    <string name="ram">RAM</string>
     <string name="disco">Disco</string>
     <string name="red">Red</string>
     <string name="uso_reciente">Uso reciente</string>
+    <string name="uso_en_vivo">Uso en vivo</string>
+    <string name="nucleos_logicos">Núcleos lógicos</string>
+    <string name="nucleos_aviso">El servidor no envía el uso por núcleo. Actualice MIRS en el PC a la versión 0.4.</string>
+    <string name="pastilla_conectando">CONECTANDO</string>
+    <string name="pastilla_vivo">EN VIVO</string>
+    <string name="pastilla_sin_conexion">SIN CONEXIÓN</string>
+    <string name="sin_conexion_titulo">No hay conexión con el PC</string>
+    <string name="sin_conexion_detalle">No responde el servidor en
+%1$s
+
+Verifique que la ventana de MIRS siga abierta en el PC y que estén en la misma red.</string>
+    <string name="reintentar">Reintentar</string>
+    <string name="nueva_alerta">Nueva alerta: %1$s</string>
     <string name="mayor_consumo">Mayor consumo</string>
     <string name="buscar_proceso">Buscar por nombre o PID</string>
     <string name="solo_lectura">Lista de solo lectura. Para finalizar o cambiar la prioridad de un proceso use la aplicación del PC.</string>

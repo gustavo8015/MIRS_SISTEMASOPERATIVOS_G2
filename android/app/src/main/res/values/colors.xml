@@ -1,19 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Tema oscuro tipo "centro de control". Los nombres se conservan de la versión clara. -->
 <resources>
-    <color name="primario">#1E40AF</color>
-    <color name="primario_oscuro">#1B2A5A</color>
-    <color name="acento">#D97706</color>
-    <color name="peligro">#DC2626</color>
-    <color name="exito">#15803D</color>
-    <color name="fondo">#F8FAFC</color>
-    <color name="tarjeta">#FFFFFF</color>
-    <color name="borde">#CBD5E1</color>
-    <color name="texto">#1E293B</color>
-    <color name="texto_suave">#475569</color>
-    <color name="pista">#E2E8F0</color>
-    <color name="fondo_peligro">#FEE2E2</color>
-    <color name="fondo_aviso">#FEF3C7</color>
-    <color name="fondo_exito">#DCFCE7</color>
-    <color name="texto_peligro">#991B1B</color>
-    <color name="texto_aviso">#92400E</color>
+    <color name="primario">#3B82F6</color>
+    <color name="primario_oscuro">#070A14</color>
+    <color name="azul_claro">#93C5FD</color>
+    <color name="acento">#F59E0B</color>
+    <color name="peligro">#EF4444</color>
+    <color name="exito">#22C55E</color>
+    <color name="fondo">#0A0F1E</color>
+    <color name="fondo_arriba">#14224A</color>
+    <color name="tarjeta">#121A2E</color>
+    <color name="vidrio">#0DFFFFFF</color>
+    <color name="vidrio_borde">#1AFFFFFF</color>
+    <color name="borde">#22304D</color>
+    <color name="texto">#F1F5F9</color>
+    <color name="texto_suave">#94A3B8</color>
+    <color name="texto_tenue">#64748B</color>
+    <color name="pista">#1E293B</color>
+    <color name="fondo_peligro">#3A1418</color>
+    <color name="fondo_aviso">#3A2A0E</color>
+    <color name="fondo_exito">#0F2E1D</color>
+    <color name="texto_peligro">#FCA5A5</color>
+    <color name="texto_aviso">#FCD34D</color>
 </resources>
