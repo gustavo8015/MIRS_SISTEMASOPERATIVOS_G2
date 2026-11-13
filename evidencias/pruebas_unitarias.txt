@@ -1,0 +1,43 @@
+test_check_rechaza_porcentaje_fuera_de_rango (test_almacenamiento.PruebasAlmacenamiento.test_check_rechaza_porcentaje_fuera_de_rango) ... ok
+test_crea_las_seis_tablas (test_almacenamiento.PruebasAlmacenamiento.test_crea_las_seis_tablas) ... ok
+test_guardar_muestra_con_sus_procesos (test_almacenamiento.PruebasAlmacenamiento.test_guardar_muestra_con_sus_procesos) ... ok
+test_llave_foranea_rechaza_equipo_inexistente (test_almacenamiento.PruebasAlmacenamiento.test_llave_foranea_rechaza_equipo_inexistente) ... ok
+test_muestra_fallida_no_deja_procesos_huerfanos (test_almacenamiento.PruebasAlmacenamiento.test_muestra_fallida_no_deja_procesos_huerfanos) ... ok
+test_registrar_equipo_dos_veces_no_duplica (test_almacenamiento.PruebasAlmacenamiento.test_registrar_equipo_dos_veces_no_duplica) ... ok
+test_umbrales_por_defecto_uno_por_recurso (test_almacenamiento.PruebasAlmacenamiento.test_umbrales_por_defecto_uno_por_recurso) ... ok
+test_uso_por_nucleo_no_se_guarda_en_la_base (test_almacenamiento.PruebasAlmacenamiento.test_uso_por_nucleo_no_se_guarda_en_la_base) ... ok
+test_valor_muy_por_encima_del_promedio (test_analizador.PruebasDesviacion.test_valor_muy_por_encima_del_promedio) ... ok
+test_variacion_normal_no_alerta (test_analizador.PruebasDesviacion.test_variacion_normal_no_alerta) ... ok
+test_crecimiento_continuo_es_posible_fuga (test_analizador.PruebasFuga.test_crecimiento_continuo_es_posible_fuga) ... ok
+test_crecimiento_pequeno_no_es_fuga (test_analizador.PruebasFuga.test_crecimiento_pequeno_no_es_fuga) ... ok
+test_memoria_que_baja_no_es_fuga (test_analizador.PruebasFuga.test_memoria_que_baja_no_es_fuga) ... ok
+test_cpu_sostenida_genera_alerta_alta (test_analizador.PruebasUmbral.test_cpu_sostenida_genera_alerta_alta) ... ok
+test_pico_corto_no_genera_alerta (test_analizador.PruebasUmbral.test_pico_corto_no_genera_alerta) ... ok
+test_sin_historial_suficiente_no_alerta (test_analizador.PruebasUmbral.test_sin_historial_suficiente_no_alerta) ... ok
+test_umbral_sin_duracion_alerta_de_inmediato (test_analizador.PruebasUmbral.test_umbral_sin_duracion_alerta_de_inmediato) ... ok
+test_detecta_el_entrante_entre_varios_puertos (test_bluetooth.PruebasDeteccion.test_detecta_el_entrante_entre_varios_puertos) ... ok
+test_distingue_entrante_de_saliente (test_bluetooth.PruebasDeteccion.test_distingue_entrante_de_saliente) ... ok
+test_modo_auto_usa_el_puerto_detectado (test_bluetooth.PruebasDeteccion.test_modo_auto_usa_el_puerto_detectado) ... ok
+test_sin_entrante_devuelve_none (test_bluetooth.PruebasDeteccion.test_sin_entrante_devuelve_none) ... ok
+test_atender_get_reenvia_a_la_api (test_bluetooth.PruebasPuente.test_atender_get_reenvia_a_la_api) ... ok
+test_post_con_error_devuelve_el_codigo_de_la_api (test_bluetooth.PruebasPuente.test_post_con_error_devuelve_el_codigo_de_la_api) ... ok
+test_puente_con_puerto_serie_real (test_bluetooth.PruebasPuente.test_puente_con_puerto_serie_real) ... ok
+test_puente_responde_una_linea_por_peticion_aunque_lleguen_por_trozos (test_bluetooth.PruebasPuente.test_puente_responde_una_linea_por_peticion_aunque_lleguen_por_trozos) ... ok
+test_rechaza_rutas_fuera_de_la_api (test_bluetooth.PruebasPuente.test_rechaza_rutas_fuera_de_la_api) ... ok
+test_datos_equipo_completos (test_recolector.PruebasRecolector.test_datos_equipo_completos) ... ok
+test_listar_procesos_respeta_el_tope_y_el_orden (test_recolector.PruebasRecolector.test_listar_procesos_respeta_el_tope_y_el_orden) ... ok
+test_muestra_en_rangos_validos (test_recolector.PruebasRecolector.test_muestra_en_rangos_validos) ... ok
+test_opcion_respaldo_del_servidor_termina_sin_iniciar_la_api (test_respaldo.PruebasRespaldo.test_opcion_respaldo_del_servidor_termina_sin_iniciar_la_api) ... ok
+test_respaldo_copia_todas_las_filas_e_integridad_ok (test_respaldo.PruebasRespaldo.test_respaldo_copia_todas_las_filas_e_integridad_ok) ... ok
+test_respaldo_no_sobrescribe_un_archivo_existente (test_respaldo.PruebasRespaldo.test_respaldo_no_sobrescribe_un_archivo_existente) ... ok
+test_estado_invalido_y_alerta_inexistente (test_servidor.PruebasApi.test_estado_invalido_y_alerta_inexistente) ... ok
+test_estado_trae_equipo_muestra_y_procesos (test_servidor.PruebasApi.test_estado_trae_equipo_muestra_y_procesos) ... ok
+test_marcar_alerta_atendida (test_servidor.PruebasApi.test_marcar_alerta_atendida) ... ok
+test_muestras_y_umbrales (test_servidor.PruebasApi.test_muestras_y_umbrales) ... ok
+test_ignora_otros_mensajes (test_servidor.PruebasDescubrimiento.test_ignora_otros_mensajes) ... ok
+test_responde_a_la_busqueda_con_nombre_y_puerto (test_servidor.PruebasDescubrimiento.test_responde_a_la_busqueda_con_nombre_y_puerto) ... ok
+
+----------------------------------------------------------------------
+Ran 38 tests in 6.989s
+
+OK

@@ -1,0 +1,40 @@
+=== Política de contraseñas y bloqueo de cuentas locales ==================
+Force user logoff how long after time expires?:       Never
+Minimum password age (days):                          0
+Maximum password age (days):                          90
+Minimum password length:                              12
+Length of password history maintained:                5
+Lockout threshold:                                    5
+Lockout duration (minutes):                           15
+Lockout observation window (minutes):                 15
+Computer role:                                        SERVER
+The command completed successfully.
+=== Auditoría de eventos ==================================================
+System audit policy
+Category/Subcategory                      Setting
+Logon/Logoff
+  Account Lockout                         Success and Failure
+  Logon                                   Success and Failure
+Object Access
+  File System                             Success and Failure
+Detailed Tracking
+  Process Creation                        Success and Failure
+Account Management
+  Security Group Management               Success and Failure
+  User Account Management                 Success and Failure
+=== Auditoría de acceso a la base de datos (SACL en C:\MIRS\datos) ========
+IdentityReference                                FileSystemRights AuditFlags
+-----------------                                ---------------- ----------
+Everyone          Write, Delete, ChangePermissions, TakeOwnership    Failure
+Everyone                 Delete, ChangePermissions, TakeOwnership    Success
+=== Actualizaciones instaladas (las más recientes) ========================
+HotFixID  Description     InstalledOn
+--------  -----------     -----------
+KB5126645 Security Update 10/24/2026 12:00:00 AM
+KB5134137 Update          10/24/2026 12:00:00 AM
+KB5127690 Update          10/24/2026 12:00:00 AM
+=== Antimalware (Microsoft Defender) ======================================
+AMServiceEnabled              : True
+AntivirusEnabled              : True
+RealTimeProtectionEnabled     : False
+AntivirusSignatureLastUpdated : 11/13/2026 3:22:00 PM

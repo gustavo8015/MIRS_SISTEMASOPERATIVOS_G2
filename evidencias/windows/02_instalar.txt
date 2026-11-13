@@ -1,0 +1,14 @@
+=== Estructura de carpetas ================================================
+FullName                      TamañoKB
+--------                      --------
+C:\MIRS\bin
+C:\MIRS\datos
+C:\MIRS\logs
+C:\MIRS\respaldos
+C:\MIRS\bin\MIRS_Servidor.exe 10032
+=== Integridad del ejecutable (SHA-256) ===================================
+Algorithm : SHA256
+Hash      : 76AE99F87F5B9F5B5AD54D8FC08A958F755C51A4DFA2F4E2FADB3817DA064D9E
+Path      : C:\MIRS\bin\MIRS_Servidor.exe
+=== Nombre del equipo =====================================================
+Nombre actual: runnervmm7ud1 (sin cambios)

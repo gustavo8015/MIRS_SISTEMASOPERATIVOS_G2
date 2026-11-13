@@ -186,7 +186,13 @@ MIRS_SISTEMASOPERATIVOS_G2/
 │   └── bluetooth.py       puente Bluetooth (puerto COM entrante, RFCOMM)
 ├── android/               app MIRS Móvil (proyecto de Android Studio)
 ├── mirs_servidor.py       punto de entrada de MIRS_Servidor.exe
-├── .github/workflows/     construcción automática del .exe en Windows
+├── scripts/
+│   ├── windows/           PowerShell 01 a 11: entorno, instalación, usuarios, tarea, firewall,
+│   │                      seguridad, respaldo, monitoreo, vigilante, pruebas y auditoría
+│   └── linux/             Bash: instalación como servicio systemd y pruebas
+├── config/                mirs-windows.psd1 (parámetros de los scripts) y mirs.service (systemd)
+├── evidencias/            salidas reales de los scripts en Windows Server 2025 y Ubuntu
+├── .github/workflows/     construcción del .exe y ejecución de los scripts de administración
 ├── database/schema.sql    esquema de las seis tablas
 ├── tests/                 pruebas unitarias
 ├── datos/                 aquí se crea mirs.db (no se versiona)
@@ -194,7 +200,8 @@ MIRS_SISTEMASOPERATIVOS_G2/
 │   ├── ficha/             ficha técnica (Entrega 1)
 │   ├── diagramas/         arquitectura y modelo relacional (fuente y PNG)
 │   ├── mockups/           pantallas propuestas de la interfaz (HTML y PNG)
-│   └── Entrega2_*.docx/pdf documento de la Entrega 2
+│   ├── Entrega2_*.docx/pdf documento de la Entrega 2
+│   └── Documento_Tecnico_Final_*.docx/pdf  documento técnico final
 ├── requirements.txt
 └── README.md
 ```
@@ -248,13 +255,36 @@ pyinstaller --onefile --name MIRS_Servidor --paths src --add-data "database/sche
 
 Para ver una alerta en la demostración, baje temporalmente el umbral de CPU en la tabla `umbral` (por ejemplo a 30 % y 10 s) o ponga el equipo bajo carga.
 
+## Administración en Windows (instalación permanente)
+
+Los scripts de `scripts/windows` dejan MIRS instalado como lo haría un administrador: en `C:\MIRS`, arrancando con el equipo, con cuentas de mínimo privilegio, firewall, auditoría y respaldos. Se ejecutan en PowerShell **como administrador**, desde la raíz del repositorio, y leen sus parámetros de `config/mirs-windows.psd1`.
+
+```powershell
+Set-ExecutionPolicy -Scope Process Bypass
+.\scripts\windows\01_entorno.ps1                      # sistema operativo, CPU, memoria, discos y red
+.\scripts\windows\02_instalar.ps1 -Origen .\MIRS_Servidor.exe
+.\scripts\windows\06_seguridad.ps1                    # contraseñas, bloqueo, auditoría, actualizaciones
+.\scripts\windows\03_usuarios_permisos.ps1 -ProbarAcceso
+.\scripts\windows\04_servicio.ps1                     # tarea MIRS-Servidor como LOCAL SERVICE
+.\scripts\windows\05_firewall.ps1                     # TCP 8765 y UDP 8766 solo en la subred local
+.\scripts\windows\07_respaldo.ps1 -Registrar          # respaldo en caliente diario con retención de 7
+.\scripts\windows\09_vigilante.ps1 -Registrar         # reinicia el servidor si la API deja de responder
+.\scripts\windows\08_monitoreo.ps1                    # MIRS frente a los contadores de Windows
+.\scripts\windows\10_pruebas.ps1 -Carga               # 13 pruebas con resultado OK o FALLA
+.\scripts\windows\11_auditoria.ps1 -ProbarBloqueo     # bloqueo de cuenta y eventos de seguridad
+```
+
+En Linux: `sudo bash scripts/linux/instalar.sh` y `sudo bash scripts/linux/pruebas.sh`. El flujo `.github/workflows/evidencias.yml` corre todo esto en máquinas limpias de Windows Server 2025 y Ubuntu y su salida está en [`evidencias/`](evidencias/).
+
+El servidor también hace respaldos sin detenerse: `MIRS_Servidor.exe --bd C:\MIRS\datos\mirs.db --respaldo copia.db` copia la base con la API de respaldo de SQLite y verifica su integridad.
+
 ## Pruebas
 
 ```powershell
 python -m unittest discover -s tests -v
 ```
 
-Treinta y cinco pruebas cubren el recolector (rangos válidos, orden y límite de la lista de procesos, prioridad como entero), el almacenamiento (seis tablas, equipo sin duplicados, un umbral por recurso, llave foránea, `CHECK` de porcentajes y transacción sin procesos huérfanos), las reglas del analizador (umbral sostenido frente a pico corto, desviación del historial y posible fuga de memoria) y la API (estado, historial, umbrales, cambio de estado de una alerta, errores 400 y 404, respuesta a la búsqueda de equipos por UDP) y el puente Bluetooth (reenvío a la API, rechazo de rutas fuera de `/api/`, códigos de error y lectura por trozos, también sobre un puerto serie real emulado con un pseudoterminal) y la detección automática del puerto COM entrante frente a salientes y puertos USB.
+Treinta y ocho pruebas cubren el recolector (rangos válidos, orden y límite de la lista de procesos, prioridad como entero), el almacenamiento (seis tablas, equipo sin duplicados, un umbral por recurso, llave foránea, `CHECK` de porcentajes y transacción sin procesos huérfanos), las reglas del analizador (umbral sostenido frente a pico corto, desviación del historial y posible fuga de memoria) y la API (estado, historial, umbrales, cambio de estado de una alerta, errores 400 y 404, respuesta a la búsqueda de equipos por UDP) y el puente Bluetooth (reenvío a la API, rechazo de rutas fuera de `/api/`, códigos de error y lectura por trozos, también sobre un puerto serie real emulado con un pseudoterminal) , la detección automática del puerto COM entrante frente a salientes y puertos USB, y el respaldo en caliente (copia íntegra, no sobrescribe, opción `--respaldo`).
 
 ## Hoja de ruta
 

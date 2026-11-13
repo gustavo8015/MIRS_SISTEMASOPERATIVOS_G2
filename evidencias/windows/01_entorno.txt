@@ -1,0 +1,29 @@
+=== Sistema operativo =====================================================
+Equipo       : runnervmm7ud1
+Sistema      : Microsoft Windows Server 2025 Datacenter
+Version      : 10.0.26100
+Compilacion  : 26100
+Arquitectura : 64-bit
+Instalado    : 11/3/2026 6:24:57 PM
+UltimoInicio : 11/13/2026 10:29:38 PM
+=== Procesador y memoria ==================================================
+Procesador     : Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz
+NucleosFisicos : 2
+NucleosLogicos : 4
+MemoriaTotalGB : 16
+MemoriaLibreGB : 13.3
+Virtualizado   : Virtual Machine
+=== Almacenamiento (discos y volúmenes) ===================================
+Number FriendlyName      PartitionStyle TamañoGB
+------ ------------      -------------- --------
+     0 Msft Virtual Disk GPT                 150
+     1 Msft Virtual Disk MBR                 150
+DriveLetter FileSystem TamañoGB LibreGB HealthStatus
+----------- ---------- -------- ------- ------------
+          D NTFS            150     147 Healthy
+          C NTFS          149.9      31 Healthy
+=== Red ===================================================================
+Interfaz        IPv4        Puerta   DNS
+--------        ----        ------   ---
+vEthernet (nat) 172.17.32.1
+Ethernet 3      10.1.0.128  10.1.0.1 168.63.129.16

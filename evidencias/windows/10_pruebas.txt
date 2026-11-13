@@ -1,0 +1,21 @@
+=== Pruebas de funcionamiento en runnervmm7ud1 ============================
+2026-11-13 22:33:35 API sin respuesta (Unable to connect to the remote server); se reinicia MIRS-Servidor
+2026-11-13 22:33:36 Servidor recuperado
+ID  Resultado Prueba                                                                     Detalle
+--  --------- ------                                                                     -------
+P01 OK        Sistema operativo compatible (Windows 10 o posterior)                      Microsoft Windows Server 2025 Datacenter
+P02 OK        Usuarios y grupos de MIRS creados                                          mirs_operador en MIRS-Operadores
+P03 OK        Operadores sin permiso de escritura en datos                               derechos: ReadAndExecute, Synchronize
+P04 OK        Grupo Users sin acceso a C:\MIRS                                           herencia cortada
+P05 OK        Tarea del servidor registrada como LOCAL SERVICE                           estado Running
+P06 OK        API responde con una muestra válida                                        CPU 5.8 %, RAM 18.3 %
+P07 OK        Ruta inexistente devuelve 404                                              HTTP 404
+P08 OK        Búsqueda de equipos por UDP 8766                                           runnervmm7ud1 puerto 8765
+P09 OK        Reglas de firewall activas y limitadas a la subred local                   2 reglas Allow (Privado/Dominio), origen LocalSubnet
+P10 OK        Política de contraseñas aplicada                                           longitud mínima 12
+P11 OK        Respaldo existente e íntegro                                               mirs_20261113_223303.db (60 KB)
+P12 OK        Recuperación ante fallo: proceso terminado y restablecido por el vigilante PID 5912 9120 terminado, nuevo PID 3208 5020
+P13 OK        Carga de CPU sostenida genera alerta                                       63 s después de iniciar la carga: CPU en 100 %, sobre el umbral de 85
+                                                                                         % durante 60 s. Proceso principal: MIRS_Servidor.exe (PID 3208). CPU
+                                                                                         durante la carga: promedio 99 %, mínimo 75 %
+Pruebas: 13  OK: 13  FALLA: 0

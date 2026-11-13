@@ -1,0 +1,12 @@
+=== Perfiles del firewall =================================================
+Name    Enabled DefaultInboundAction DefaultOutboundAction
+----    ------- -------------------- ---------------------
+Domain     True        NotConfigured         NotConfigured
+Private    True        NotConfigured         NotConfigured
+Public     True        NotConfigured         NotConfigured
+=== Reglas de entrada de MIRS =============================================
+Regla                            Accion          Perfil Protocolo Puerto Origen      Activa
+-----                            ------          ------ --------- ------ ------      ------
+MIRS - API (TCP 8765)             Allow Domain, Private TCP       8765   LocalSubnet   True
+MIRS - Buscar equipos (UDP 8766)  Allow Domain, Private UDP       8766   LocalSubnet   True
+MIRS - Bloqueo en red pública     Block          Public TCP       8765   Any           True

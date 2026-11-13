@@ -1,0 +1,28 @@
+=== Intentos de inicio de sesión fallidos con mirs_operador ===============
+Intento 1: rechazado (This command cannot be run due to the error: The user name or password is incorrect.)
+Intento 2: rechazado (This command cannot be run due to the error: The user name or password is incorrect.)
+Intento 3: rechazado (This command cannot be run due to the error: The user name or password is incorrect.)
+Intento 4: rechazado (This command cannot be run due to the error: The user name or password is incorrect.)
+Intento 5: rechazado (This command cannot be run due to the error: The user name or password is incorrect.)
+Cuenta bloqueada: True
+La cuenta se desbloqueó manualmente para continuar.
+=== Eventos de seguridad registrados (últimos 30 minutos) =================
+IdEvento Descripcion                     Cantidad Ultimo
+-------- -----------                     -------- ------
+4625     Inicio de sesión fallido               5 11/13/2026 10:34:42 PM
+4670     Permisos de un objeto cambiados        2 11/13/2026 10:32:18 PM
+4688     Proceso creado (MIRS_Servidor)         8 11/13/2026 10:33:35 PM
+4720     Cuenta creada                          2 11/13/2026 10:32:18 PM
+4732     Miembro agregado a grupo local         4 11/13/2026 10:32:18 PM
+4740     Cuenta bloqueada                       1 11/13/2026 10:34:42 PM
+4767     Cuenta desbloqueada                    1 11/13/2026 10:34:42 PM
+=== Detalle del bloqueo y de los intentos fallidos ========================
+Hora                     Id Cuenta        Estado
+----                     -- ------        ------
+11/13/2026 10:34:42 PM 4625 mirs_operador 0xc000006d
+11/13/2026 10:34:42 PM 4625 mirs_operador 0xc000006d
+11/13/2026 10:34:42 PM 4625 mirs_operador 0xc000006d
+11/13/2026 10:34:42 PM 4625 mirs_operador 0xc000006d
+11/13/2026 10:34:42 PM 4740 mirs_operador
+11/13/2026 10:34:42 PM 4625 mirs_operador 0xc000006d
+11/13/2026 10:34:42 PM 4767 mirs_operador
