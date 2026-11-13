@@ -4,6 +4,8 @@ Uso (desde la carpeta del repositorio, con PYTHONPATH=src):
     python -m mirs.servidor                 # solo este PC y el emulador de Android (127.0.0.1:8765)
     python -m mirs.servidor --lan           # también otros equipos de la red (0.0.0.0:8765)
 
+Con --bluetooth COM5 también atiende a la app por Bluetooth (ver bluetooth.py).
+
 Con --lan el servidor además responde a la búsqueda de equipos de la app: escucha en UDP 8766
 el mensaje MIRS_BUSCAR y contesta con su nombre y su puerto, así la app lo encuentra sin escribir la IP.
 
@@ -177,6 +179,8 @@ def main(argv: list[str] | None = None, lan_por_defecto: bool = False) -> None:
                         help="aceptar conexiones de otros equipos de la red y responder a la búsqueda")
     parser.add_argument("--solo-local", dest="lan", action="store_false",
                         help="atender solo a este PC y al emulador de Android")
+    parser.add_argument("--bluetooth", metavar="COM",
+                        help="puerto COM entrante de Bluetooth para atender a la app sin red (p. ej. COM5)")
     parser.add_argument("--intervalo", type=float, default=config.INTERVALO_SEG)
     parser.add_argument("--bd", default=str(config.RUTA_BD))
     args = parser.parse_args(argv)
@@ -205,6 +209,11 @@ def main(argv: list[str] | None = None, lan_por_defecto: bool = False) -> None:
         except OSError:
             log.warning("No se pudo abrir el puerto UDP %d: la app no encontrará este equipo con "
                         "Buscar equipos, pero puede escribir la dirección a mano.", config.PUERTO_DESCUBRIMIENTO)
+    puente = None
+    if args.bluetooth:
+        from .bluetooth import PuenteBluetooth
+        puente = PuenteBluetooth(args.bluetooth, f"http://127.0.0.1:{args.puerto}")
+        puente.start()
     log.info("MIRS %s monitoreando %s cada %.0f s", __version__, equipo["nombre_host"], args.intervalo)
     log.info("API en http://127.0.0.1:%d/api/estado  (emulador Android: http://10.0.2.2:%d)", args.puerto, args.puerto)
     if args.lan:
@@ -220,6 +229,8 @@ def main(argv: list[str] | None = None, lan_por_defecto: bool = False) -> None:
         planificador.detener()
         if busqueda:
             busqueda.detener()
+        if puente:
+            puente.detener()
         servidor.server_close()
         log.info("Servidor detenido")
 
