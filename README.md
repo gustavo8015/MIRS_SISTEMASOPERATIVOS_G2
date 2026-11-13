@@ -291,10 +291,16 @@ Treinta y ocho pruebas cubren el recolector (rangos válidos, orden y límite de
 | Entrega | Contenido | Estado |
 |---|---|---|
 | 1 | Ficha técnica del proyecto | Entregada |
-| 2 | Levantamiento de información, descripción, estructura del prototipo y tecnologías | Esta versión |
-| 3 | Planificador de muestreo, motor de análisis, alertas, API y app móvil | En curso (implementados) |
-| 4 | Interfaz Tkinter completa, gestor de procesos e informe | Pendiente |
-| 5 | Pruebas finales, manual de usuario y sustentación | Pendiente |
+| 2 (Fase I) | Levantamiento de información, descripción, estructura del prototipo y tecnologías | Entregada |
+| Fase II (S14) | Servidor de monitoreo, motor de alertas, API, app móvil (Wi-Fi y Bluetooth), respaldo en caliente, administración del sistema operativo (scripts de Windows y Linux), pruebas y evidencias | Esta versión |
+| Final | Socialización: demostración del entorno funcionando y documento técnico final | Pendiente |
+
+### Avance de la Fase II
+
+- **Componentes:** servidor `MIRS_Servidor.exe` (muestreo cada 2 s, tres reglas de detección, API HTTP en TCP 8765, búsqueda de equipos por UDP 8766, puente Bluetooth) y app Android MIRS Móvil.
+- **Configuración del sistema operativo:** instalación en `C:\MIRS`, tarea programada como LOCAL SERVICE, grupos y permisos NTFS de mínimo privilegio, firewall limitado a la subred local, política de contraseñas, auditoría y respaldo diario (`scripts/windows`); equivalente con systemd y ufw en Linux (`scripts/linux`).
+- **Pruebas:** 38 pruebas unitarias, 13 pruebas de funcionamiento en Windows Server 2025 y 9 en Ubuntu, todas superadas ([evidencias](evidencias/)).
+- **Documentación:** [documento técnico final](docs/Documento_Tecnico_Final_MIRS.pdf).
 
 ## Convención de commits
 
