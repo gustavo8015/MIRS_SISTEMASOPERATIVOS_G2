@@ -101,10 +101,16 @@ public class MainActivity extends AppCompatActivity {
 
     private final ProcesoAdapter procesosAdapter = new ProcesoAdapter();
 
-    /** Android 12 o superior pide en tiempo de ejecución el permiso de dispositivos cercanos. */
-    private final ActivityResultLauncher<String> permisoBluetooth =
-            registerForActivityResult(new ActivityResultContracts.RequestPermission(), concedido -> {
-                if (concedido) {
+    private SelectorBluetooth selector;
+
+    /**
+     * Permisos para buscar y conectar por Bluetooth: en Android 12 o superior, "dispositivos
+     * cercanos" (BLUETOOTH_SCAN y BLUETOOTH_CONNECT); en versiones anteriores, la ubicación,
+     * que Android exige para buscar equipos Bluetooth.
+     */
+    private final ActivityResultLauncher<String[]> permisosBluetooth =
+            registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), resultado -> {
+                if (tienePermisosBusqueda()) {
                     elegirEquipoBluetooth();
                 } else {
                     Toast.makeText(this, R.string.bt_permiso, Toast.LENGTH_LONG).show();
@@ -246,6 +252,9 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         red.shutdownNow();
         api.cerrar();
+        if (selector != null) {
+            selector.terminar();
+        }
     }
 
     private int color(int id) {
@@ -650,10 +659,23 @@ public class MainActivity extends AppCompatActivity {
                 == PackageManager.PERMISSION_GRANTED;
     }
 
-    @SuppressLint("MissingPermission")
+    private String[] permisosBusqueda() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+                ? new String[]{Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT}
+                : new String[]{Manifest.permission.ACCESS_FINE_LOCATION};
+    }
+
+    private boolean tienePermisosBusqueda() {
+        for (String permiso : permisosBusqueda()) {
+            if (ContextCompat.checkSelfPermission(this, permiso) != PackageManager.PERMISSION_GRANTED) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     private static String nombreEquipo(BluetoothDevice equipo) {
-        String nombre = equipo.getName();
-        return nombre == null || nombre.isEmpty() ? equipo.getAddress() : nombre;
+        return SelectorBluetooth.nombre(equipo);
     }
 
     private void conectarPorBluetooth() {
@@ -665,15 +687,14 @@ public class MainActivity extends AppCompatActivity {
                     .show();
             return;
         }
-        if (tienePermisoBluetooth()) {
+        if (tienePermisosBusqueda()) {
             elegirEquipoBluetooth();
         } else {
-            permisoBluetooth.launch(Manifest.permission.BLUETOOTH_CONNECT);
+            permisosBluetooth.launch(permisosBusqueda());
         }
     }
 
-    /** Muestra los equipos ya emparejados con el celular; no hace falta buscar ni escanear. */
-    @SuppressLint("MissingPermission")
+    /** Busca los dispositivos Bluetooth cercanos; al elegir uno lo empareja si hace falta y se conecta. */
     private void elegirEquipoBluetooth() {
         BluetoothAdapter adaptador = adaptadorBluetooth();
         if (adaptador == null) {
@@ -683,33 +704,13 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, R.string.bt_apagado, Toast.LENGTH_LONG).show();
             return;
         }
-        List<BluetoothDevice> equipos = new ArrayList<>(adaptador.getBondedDevices());
-        if (equipos.isEmpty()) {
-            new MaterialAlertDialogBuilder(this)
-                    .setTitle(R.string.bt_sin_emparejados)
-                    .setMessage(R.string.bt_ayuda)
-                    .setPositiveButton(R.string.cerrar, null)
-                    .show();
-            return;
+        if (selector != null) {
+            selector.terminar();
         }
-        String[] etiquetas = new String[equipos.size()];
-        for (int i = 0; i < equipos.size(); i++) {
-            etiquetas[i] = nombreEquipo(equipos.get(i)) + "\n" + equipos.get(i).getAddress();
-        }
-        new MaterialAlertDialogBuilder(this)
-                .setTitle(R.string.bt_elegir)
-                .setItems(etiquetas, (d, i) -> {
-                    BluetoothDevice equipo = equipos.get(i);
-                    String nombre = nombreEquipo(equipo);
-                    Toast.makeText(this, getString(R.string.bt_conectando, nombre), Toast.LENGTH_SHORT).show();
-                    usarConexion(new ClienteBluetooth(equipo, nombre), PREFIJO_BLUETOOTH + equipo.getAddress());
-                })
-                .setNeutralButton(R.string.ayuda, (d, b) -> new MaterialAlertDialogBuilder(this)
-                        .setTitle(R.string.menu_bluetooth)
-                        .setMessage(R.string.bt_ayuda)
-                        .setPositiveButton(R.string.cerrar, null)
-                        .show())
-                .setNegativeButton(R.string.cancelar, null)
-                .show();
+        selector = new SelectorBluetooth(this, adaptador, (equipo, nombre) -> {
+            Toast.makeText(this, getString(R.string.bt_conectando, nombre), Toast.LENGTH_SHORT).show();
+            usarConexion(new ClienteBluetooth(equipo, nombre), PREFIJO_BLUETOOTH + equipo.getAddress());
+        });
+        selector.mostrar();
     }
 }

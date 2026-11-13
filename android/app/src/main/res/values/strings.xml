@@ -35,14 +35,15 @@
 Verifique que la ventana de MIRS siga abierta en el PC y que estén en la misma red (o, por Bluetooth, que el portátil esté cerca y el servidor tenga --bluetooth).</string>
     <string name="reintentar">Reintentar</string>
     <string name="menu_bluetooth">Conectar por Bluetooth</string>
-    <string name="bt_elegir">Elija el portátil emparejado</string>
+    <string name="bt_buscando">Buscando dispositivos Bluetooth…</string>
+    <string name="bt_dispositivos">Dispositivos Bluetooth</string>
+    <string name="bt_ninguno_cerca">No se encontraron dispositivos</string>
+    <string name="bt_emparejando">Acepte el emparejamiento en el celular y en el portátil</string>
+    <string name="bt_emparejado_fallo">No se completó el emparejamiento con %1$s</string>
     <string name="bt_sin_adaptador">Este dispositivo no tiene Bluetooth. El emulador de Android Studio no lo trae: use un celular Android real.</string>
     <string name="bt_apagado">Active el Bluetooth del celular e intente de nuevo.</string>
-    <string name="bt_sin_emparejados">No hay equipos emparejados</string>
-    <string name="bt_ayuda">1. Empareje el portátil con este celular desde los ajustes de Bluetooth.
-2. En Windows: Más opciones de Bluetooth > Puertos COM > Agregar > Entrante, y anote el puerto (por ejemplo COM5).
-3. En el portátil ejecute: python -m mirs.servidor --bluetooth COM5</string>
-    <string name="bt_permiso">Sin el permiso de dispositivos cercanos la app no puede conectarse por Bluetooth.</string>
+    <string name="bt_ayuda">Para que el portátil aparezca en la lista, en Windows abra Configuración &gt; Bluetooth y dispositivos y déjela abierta, o marque \"Permitir que los dispositivos Bluetooth encuentren este equipo\" en Más opciones de Bluetooth.\n\nPara poder conectarse, una sola vez: Más opciones de Bluetooth &gt; Puertos COM &gt; Agregar &gt; Entrante. Windows asigna un número (por ejemplo COM8).\n\nEn el portátil, deje abierto el servidor: python -m mirs.servidor --bluetooth COM8 (o MIRS_Servidor.exe --bluetooth COM8).\n\nEn Android 11 o anterior, la búsqueda necesita la ubicación activada.</string>
+    <string name="bt_permiso">Sin el permiso de dispositivos cercanos la app no puede buscar ni conectarse por Bluetooth.</string>
     <string name="bt_conectando">Conectando por Bluetooth con %1$s…</string>
     <string name="nueva_alerta">Nueva alerta: %1$s</string>
     <string name="mayor_consumo">Mayor consumo</string>

@@ -109,7 +109,7 @@ Celular  --Bluetooth RFCOMM (SPP)-->  COM entrante de Windows  -->  bluetooth.py
 
 Requiere un **celular Android real**: el emulador de Android Studio no tiene Bluetooth.
 
-1. **Emparejar.** Empareje el celular con el portátil desde la configuración de Bluetooth de Windows.
+1. **Emparejar.** Puede hacerlo desde la app (paso 4) o desde la configuración de Bluetooth de Windows.
 2. **Crear el puerto COM entrante (una sola vez).** En Windows: Configuración, Bluetooth y dispositivos, Dispositivos, **Más opciones de Bluetooth**, pestaña **Puertos COM**, **Agregar**, elegir **Entrante** y Aceptar. Anote el puerto que aparece, por ejemplo `COM5`.
 3. **Iniciar el servidor con Bluetooth:**
 
@@ -119,7 +119,9 @@ Requiere un **celular Android real**: el emulador de Android Studio no tiene Blu
    ```
 
    Debe mostrar `Bluetooth: esperando la app en COM5`.
-4. **Conectar desde la app.** Toque el ícono de Bluetooth del encabezado, conceda el permiso de dispositivos cercanos y elija el portátil en la lista de equipos emparejados. El subtítulo mostrará `· Bluetooth` y la app recordará la conexión.
+4. **Conectar desde la app.** Toque el ícono de Bluetooth del encabezado y conceda el permiso de dispositivos cercanos. La app busca los dispositivos Bluetooth cercanos: muestra primero los emparejados, marca los computadores y va agregando los que encuentra. Si el portátil no está emparejado, al tocarlo la app lo empareja (acepte el código en el celular y en el portátil) y se conecta. El subtítulo mostrará `· Bluetooth` y la app recordará la conexión.
+
+   Para que el portátil aparezca en la búsqueda, deje abierta en Windows la página **Bluetooth y dispositivos** o active **Permitir que los dispositivos Bluetooth encuentren este equipo** en Más opciones de Bluetooth. En Android 11 o anterior la búsqueda también necesita la ubicación activada.
 
 Si el portátil no aparece en la lista, revise el emparejamiento. Si aparece pero no conecta, revise que el servidor muestre la línea del paso 3 y que el número del puerto COM sea el entrante (no el saliente).
 
