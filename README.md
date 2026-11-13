@@ -9,7 +9,7 @@ Proyecto de aula (ABP) de la asignatura **Sistemas Operativos**, Ingeniería de 
 | Autores | Gustavo Adolfo Cardona Bayona · Jonathan Soler Guevara · Sebastián Torrez Florez |
 | Lenguaje | Python 3.10 o superior (PC) y Java (app Android) |
 | Plataforma | Windows 10/11 (el núcleo de lectura también funciona en Linux); app para Android 8.0 o superior |
-| Estado | Versión 0.6.0: monitoreo continuo, alertas, API, app móvil, búsqueda de equipos e instalador para Windows |
+| Estado | Versión 1.0.0 (final): app móvil MIRS Móvil con panel en vivo, procesos y alertas; conexión por Wi-Fi y Bluetooth; servidor de monitoreo con detección de anomalías |
 
 ## Contexto
 
