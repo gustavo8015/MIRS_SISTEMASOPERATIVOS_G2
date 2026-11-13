@@ -39,6 +39,30 @@ class Almacenamiento:
         with self.sesion() as c:
             c.executescript(esquema)
 
+    def respaldar(self, destino: str | Path) -> dict:
+        """Copia la base de datos en caliente con la API de respaldo de SQLite.
+
+        Funciona mientras el servidor sigue escribiendo (no hace falta detenerlo) y deja una copia
+        consistente. No sobrescribe un archivo existente. Devuelve el resultado de
+        PRAGMA integrity_check sobre la copia y la cantidad de filas por tabla.
+        """
+        destino = Path(destino)
+        if destino.exists():
+            raise FileExistsError(f"Ya existe {destino}")
+        destino.parent.mkdir(parents=True, exist_ok=True)
+        origen = self.conectar()
+        copia = sqlite3.connect(destino)
+        try:
+            origen.backup(copia)
+            integridad = copia.execute("PRAGMA integrity_check").fetchone()[0]
+            tablas = [f[0] for f in copia.execute(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name")]
+            filas = {t: copia.execute(f'SELECT COUNT(*) FROM "{t}"').fetchone()[0] for t in tablas}
+        finally:
+            copia.close()
+            origen.close()
+        return {"destino": str(destino), "integridad": integridad, "filas": filas}
+
     def registrar_equipo(self, datos: dict) -> int:
         """Inserta el equipo o actualiza sus datos si el host ya existe."""
         with self.sesion() as c:

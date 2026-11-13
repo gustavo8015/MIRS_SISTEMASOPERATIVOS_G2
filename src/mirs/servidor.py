@@ -188,11 +188,17 @@ def main(argv: list[str] | None = None, lan_por_defecto: bool = False,
                         help="no usar Bluetooth")
     parser.add_argument("--intervalo", type=float, default=config.INTERVALO_SEG)
     parser.add_argument("--bd", default=str(config.RUTA_BD))
+    parser.add_argument("--respaldo", metavar="ARCHIVO",
+                        help="copiar la base de datos a ARCHIVO (en caliente) y terminar sin iniciar la API")
     args = parser.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s", datefmt="%H:%M:%S")
 
     bd = Almacenamiento(args.bd)
     bd.inicializar()
+    if args.respaldo:
+        resultado = bd.respaldar(args.respaldo)
+        print(json.dumps(resultado, ensure_ascii=False))
+        raise SystemExit(0 if resultado["integridad"] == "ok" else 2)
     planificador = Planificador(bd, args.intervalo)
     planificador.start()
 

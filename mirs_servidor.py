@@ -12,15 +12,21 @@ sys.path.insert(0, str(Path(__file__).resolve().parent / "src"))
 from mirs import config  # noqa: E402
 from mirs.servidor import main  # noqa: E402
 
+
+def _pausar() -> None:
+    """Deja leer el error con doble clic; en tareas programadas (sin consola) no se detiene."""
+    if config.EMPAQUETADO and sys.stdin is not None and sys.stdin.isatty():
+        input("Presione Enter para cerrar...")
+
+
 if __name__ == "__main__":
     try:
         main(lan_por_defecto=True, bluetooth_por_defecto="auto")
     except SystemExit as salida:
-        if config.EMPAQUETADO and salida.code:
-            input("Presione Enter para cerrar...")
+        if salida.code:
+            _pausar()
         raise
     except Exception as error:  # que la ventana no se cierre sin mostrar el error
         print(f"Error: {error}")
-        if config.EMPAQUETADO:
-            input("Presione Enter para cerrar...")
+        _pausar()
         raise
