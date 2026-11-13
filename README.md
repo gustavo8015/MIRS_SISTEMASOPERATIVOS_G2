@@ -9,7 +9,7 @@ Proyecto de aula (ABP) de la asignatura **Sistemas Operativos**, Ingeniería de 
 | Autores | Gustavo Adolfo Cardona Bayona · Jonathan Soler Guevara · Sebastián Torrez Florez |
 | Lenguaje | Python 3.10 o superior (PC) y Java (app Android) |
 | Plataforma | Windows 10/11 (el núcleo de lectura también funciona en Linux); app para Android 8.0 o superior |
-| Estado | Versión 0.4.0: monitoreo continuo, alertas, API, app móvil, búsqueda de equipos e instalador para Windows |
+| Estado | Versión 0.5.0: monitoreo continuo, alertas, API, app móvil, búsqueda de equipos e instalador para Windows |
 
 ## Contexto
 
@@ -80,7 +80,7 @@ Celular / emulador  --HTTP-->  servidor.py (PC)  -->  mirs.db (SQLite)
 | Procesos | Procesos de la última muestra con PID, estado, prioridad, hilos, CPU y memoria; búsqueda por nombre o PID |
 | Alertas | Alertas activas o todas, con severidad, mensaje y recomendación; botones para marcarlas como atendidas o descartarlas |
 
-La app es de consulta: no finaliza procesos ni cambia prioridades, porque esas acciones requieren confirmación frente al equipo. La única escritura es el estado de una alerta.
+Por red la app llega al PC con HTTP; por Bluetooth, con RFCOMM (ver más abajo). La app es de consulta: no finaliza procesos ni cambia prioridades, porque esas acciones requieren confirmación frente al equipo. La única escritura es el estado de una alerta.
 
 **Diseño.** Tema oscuro tipo centro de control con tarjetas translúcidas y barra de navegación flotante. Las animaciones (anillos que se llenan, cifras que suben como contador, transición entre pestañas, pulso de alerta, vibración corta al llegar una alerta nueva) respetan la opción de Android de reducir animaciones. El chip es un modelo 3D propio (`Chip3DView`): rota los vértices, los proyecta con perspectiva, descarta las caras ocultas, las ordena de la más lejana a la más cercana y las sombrea con una luz direccional; se puede girar con el dedo. El mapa de núcleos muestra cómo el planificador del sistema operativo reparte la carga. Todo se dibuja con `Canvas`, sin librerías externas.
 
@@ -98,6 +98,30 @@ Al igual que la interfaz del PC, la app separa la red de la pantalla: las consul
 | `POST /api/alertas/<id>` | Cuerpo `{"estado": "ATENDIDA"}` o `{"estado": "DESCARTADA"}` |
 
 El servidor usa solo la biblioteca estándar de Python (`http.server`). No tiene autenticación: por defecto escucha únicamente en el propio PC (127.0.0.1), que es lo que necesita el emulador; la opción `--lan` lo abre a la red para otros equipos y celulares.
+
+### Conexión por Bluetooth
+
+La app también puede ver un portátil sin red, directamente por Bluetooth clásico (RFCOMM, perfil de puerto serie SPP). Windows publica ese perfil como un **puerto COM entrante**; el servidor de MIRS lo atiende con pyserial y responde lo mismo que la API HTTP. Cada petición viaja como una línea (`GET /api/estado`) y cada respuesta como otra (`200 {json}`).
+
+```
+Celular  --Bluetooth RFCOMM (SPP)-->  COM entrante de Windows  -->  bluetooth.py  -->  API local
+```
+
+Requiere un **celular Android real**: el emulador de Android Studio no tiene Bluetooth.
+
+1. **Emparejar.** Empareje el celular con el portátil desde la configuración de Bluetooth de Windows.
+2. **Crear el puerto COM entrante (una sola vez).** En Windows: Configuración, Bluetooth y dispositivos, Dispositivos, **Más opciones de Bluetooth**, pestaña **Puertos COM**, **Agregar**, elegir **Entrante** y Aceptar. Anote el puerto que aparece, por ejemplo `COM5`.
+3. **Iniciar el servidor con Bluetooth:**
+
+   ```powershell
+   python -m mirs.servidor --bluetooth COM5
+   # o con el ejecutable:  MIRS_Servidor.exe --bluetooth COM5
+   ```
+
+   Debe mostrar `Bluetooth: esperando la app en COM5`.
+4. **Conectar desde la app.** Toque el ícono de Bluetooth del encabezado, conceda el permiso de dispositivos cercanos y elija el portátil en la lista de equipos emparejados. El subtítulo mostrará `· Bluetooth` y la app recordará la conexión.
+
+Si el portátil no aparece en la lista, revise el emparejamiento. Si aparece pero no conecta, revise que el servidor muestre la línea del paso 3 y que el número del puerto COM sea el entrante (no el saliente).
 
 ### Búsqueda de equipos
 
@@ -137,6 +161,7 @@ Las reglas de integridad se aplican en la propia base de datos: llaves foráneas
 | SQLite 3 (`sqlite3`) | Historial local, sin servidor |
 | threading | Hilo de muestreo en segundo plano |
 | http.server | API JSON para la app móvil, sin dependencias externas |
+| pyserial | Puerto COM entrante de Bluetooth (RFCOMM) para atender a la app sin red |
 | Android (Java), AndroidX y Material Components | App móvil, compilada con Android Studio (Gradle 8.7, AGP 8.5.2, minSdk 26) |
 | unittest | Pruebas automáticas |
 | Git y GitHub | Control de versiones |
@@ -153,7 +178,8 @@ MIRS_SISTEMASOPERATIVOS_G2/
 │   ├── almacenamiento.py  acceso a SQLite
 │   ├── analizador.py      reglas de detección de anomalías
 │   ├── planificador.py    hilo de muestreo en segundo plano
-│   └── servidor.py        monitoreo continuo y API para la app móvil
+│   ├── servidor.py        monitoreo continuo y API para la app móvil
+│   └── bluetooth.py       puente Bluetooth (puerto COM entrante, RFCOMM)
 ├── android/               app MIRS Móvil (proyecto de Android Studio)
 ├── mirs_servidor.py       punto de entrada de MIRS_Servidor.exe
 ├── .github/workflows/     construcción automática del .exe en Windows
@@ -224,7 +250,7 @@ Para ver una alerta en la demostración, baje temporalmente el umbral de CPU en 
 python -m unittest discover -s tests -v
 ```
 
-Veintiséis pruebas cubren el recolector (rangos válidos, orden y límite de la lista de procesos, prioridad como entero), el almacenamiento (seis tablas, equipo sin duplicados, un umbral por recurso, llave foránea, `CHECK` de porcentajes y transacción sin procesos huérfanos), las reglas del analizador (umbral sostenido frente a pico corto, desviación del historial y posible fuga de memoria) y la API (estado, historial, umbrales, cambio de estado de una alerta, errores 400 y 404, y respuesta a la búsqueda de equipos por UDP).
+Treinta y una pruebas cubren el recolector (rangos válidos, orden y límite de la lista de procesos, prioridad como entero), el almacenamiento (seis tablas, equipo sin duplicados, un umbral por recurso, llave foránea, `CHECK` de porcentajes y transacción sin procesos huérfanos), las reglas del analizador (umbral sostenido frente a pico corto, desviación del historial y posible fuga de memoria) y la API (estado, historial, umbrales, cambio de estado de una alerta, errores 400 y 404, respuesta a la búsqueda de equipos por UDP) y el puente Bluetooth (reenvío a la API, rechazo de rutas fuera de `/api/`, códigos de error y lectura por trozos, también sobre un puerto serie real emulado con un pseudoterminal).
 
 ## Hoja de ruta
 
