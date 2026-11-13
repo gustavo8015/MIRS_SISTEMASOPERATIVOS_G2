@@ -61,5 +61,5 @@ jobs:
             2. Si Windows muestra "Windows protegió su PC", elija "Más información" y "Ejecutar de todas formas".
             3. Si el firewall pregunta, permita el acceso en redes privadas.
             4. En la app MIRS Móvil use "Buscar equipos" (mismo WiFi) o escriba http://IP-del-PC:8765.
-            Bluetooth: cree un puerto COM entrante en Windows (Más opciones de Bluetooth > Puertos COM) y ejecute
-            MIRS_Servidor.exe --bluetooth COM5; en la app toque el ícono de Bluetooth y elija el portátil.
+            Bluetooth: cree una vez un puerto COM entrante en Windows (Más opciones de Bluetooth > Puertos COM >
+            Agregar > Entrante). El .exe lo encuentra solo; en la app toque el ícono de Bluetooth y elija el portátil.

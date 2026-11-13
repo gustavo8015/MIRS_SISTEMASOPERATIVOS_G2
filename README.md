@@ -9,7 +9,7 @@ Proyecto de aula (ABP) de la asignatura **Sistemas Operativos**, Ingeniería de 
 | Autores | Gustavo Adolfo Cardona Bayona · Jonathan Soler Guevara · Sebastián Torrez Florez |
 | Lenguaje | Python 3.10 o superior (PC) y Java (app Android) |
 | Plataforma | Windows 10/11 (el núcleo de lectura también funciona en Linux); app para Android 8.0 o superior |
-| Estado | Versión 0.5.0: monitoreo continuo, alertas, API, app móvil, búsqueda de equipos e instalador para Windows |
+| Estado | Versión 0.6.0: monitoreo continuo, alertas, API, app móvil, búsqueda de equipos e instalador para Windows |
 
 ## Contexto
 
@@ -110,20 +110,22 @@ Celular  --Bluetooth RFCOMM (SPP)-->  COM entrante de Windows  -->  bluetooth.py
 Requiere un **celular Android real**: el emulador de Android Studio no tiene Bluetooth.
 
 1. **Emparejar.** Puede hacerlo desde la app (paso 4) o desde la configuración de Bluetooth de Windows.
-2. **Crear el puerto COM entrante (una sola vez).** En Windows: Configuración, Bluetooth y dispositivos, Dispositivos, **Más opciones de Bluetooth**, pestaña **Puertos COM**, **Agregar**, elegir **Entrante** y Aceptar. Anote el puerto que aparece, por ejemplo `COM5`.
-3. **Iniciar el servidor con Bluetooth:**
+2. **Crear el puerto COM entrante (una sola vez).** En Windows: Configuración, Bluetooth y dispositivos, Dispositivos, **Más opciones de Bluetooth**, pestaña **Puertos COM**, **Agregar**, elegir **Entrante** y Aceptar. Windows asigna el número solo; no hace falta anotarlo.
+3. **Iniciar el servidor.** Abra `MIRS_Servidor.exe` con doble clic: busca solo el puerto COM entrante de Bluetooth, y si se crea después de abrirlo lo detecta en unos segundos sin reiniciar. Con Python:
 
    ```powershell
-   python -m mirs.servidor --bluetooth COM5
-   # o con el ejecutable:  MIRS_Servidor.exe --bluetooth COM5
+   python -m mirs.servidor --bluetooth          # busca solo el puerto entrante
+   python -m mirs.servidor --bluetooth COM5     # o fija uno
    ```
 
-   Debe mostrar `Bluetooth: esperando la app en COM5`.
+   Debe mostrar `Bluetooth: puerto entrante detectado: COMx` y luego `Bluetooth: esperando la app en COMx`. Para abrir el `.exe` sin Bluetooth: `MIRS_Servidor.exe --sin-bluetooth`.
+
+   **Cómo detecta el puerto:** en Windows el identificador de cada puerto COM de Bluetooth termina con la dirección del dispositivo remoto. El puerto entrante no tiene dispositivo remoto, así que su dirección es `000000000000`; el servidor elige ese y descarta los salientes.
 4. **Conectar desde la app.** Toque el ícono de Bluetooth del encabezado y conceda el permiso de dispositivos cercanos. La app busca los dispositivos Bluetooth cercanos: muestra primero los emparejados, marca los computadores y va agregando los que encuentra. Si el portátil no está emparejado, al tocarlo la app lo empareja (acepte el código en el celular y en el portátil) y se conecta. El subtítulo mostrará `· Bluetooth` y la app recordará la conexión.
 
    Para que el portátil aparezca en la búsqueda, deje abierta en Windows la página **Bluetooth y dispositivos** o active **Permitir que los dispositivos Bluetooth encuentren este equipo** en Más opciones de Bluetooth. En Android 11 o anterior la búsqueda también necesita la ubicación activada.
 
-Si el portátil no aparece en la lista, revise el emparejamiento. Si aparece pero no conecta, revise que el servidor muestre la línea del paso 3 y que el número del puerto COM sea el entrante (no el saliente).
+Si el portátil no aparece en la lista, revise que esté visible (paso 4). Si aparece pero no conecta, revise que el servidor muestre las líneas del paso 3.
 
 ### Búsqueda de equipos
 
@@ -252,7 +254,7 @@ Para ver una alerta en la demostración, baje temporalmente el umbral de CPU en 
 python -m unittest discover -s tests -v
 ```
 
-Treinta y una pruebas cubren el recolector (rangos válidos, orden y límite de la lista de procesos, prioridad como entero), el almacenamiento (seis tablas, equipo sin duplicados, un umbral por recurso, llave foránea, `CHECK` de porcentajes y transacción sin procesos huérfanos), las reglas del analizador (umbral sostenido frente a pico corto, desviación del historial y posible fuga de memoria) y la API (estado, historial, umbrales, cambio de estado de una alerta, errores 400 y 404, respuesta a la búsqueda de equipos por UDP) y el puente Bluetooth (reenvío a la API, rechazo de rutas fuera de `/api/`, códigos de error y lectura por trozos, también sobre un puerto serie real emulado con un pseudoterminal).
+Treinta y cinco pruebas cubren el recolector (rangos válidos, orden y límite de la lista de procesos, prioridad como entero), el almacenamiento (seis tablas, equipo sin duplicados, un umbral por recurso, llave foránea, `CHECK` de porcentajes y transacción sin procesos huérfanos), las reglas del analizador (umbral sostenido frente a pico corto, desviación del historial y posible fuga de memoria) y la API (estado, historial, umbrales, cambio de estado de una alerta, errores 400 y 404, respuesta a la búsqueda de equipos por UDP) y el puente Bluetooth (reenvío a la API, rechazo de rutas fuera de `/api/`, códigos de error y lectura por trozos, también sobre un puerto serie real emulado con un pseudoterminal) y la detección automática del puerto COM entrante frente a salientes y puertos USB.
 
 ## Hoja de ruta
 
