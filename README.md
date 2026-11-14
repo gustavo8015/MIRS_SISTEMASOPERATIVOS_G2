@@ -288,3 +288,9 @@ Los mensajes siguen [Conventional Commits](https://www.conventionalcommits.org/e
 - Documento de la Entrega 2: [Word](docs/Entrega2_Estructura_Prototipo_MIRS.docx) · [PDF](docs/Entrega2_Estructura_Prototipo_MIRS.pdf)
 - Documento técnico final: [Word](docs/Documento_Tecnico_Final_MIRS.docx) · [PDF](docs/Documento_Tecnico_Final_MIRS.pdf)
 - [Evidencias](evidencias/)
+
+## Equipo
+
+| Integrante | Usuario de GitHub | Aporte |
+|---|---|---|
+| Gustavo Adolfo Cardona Bayona | [gustavo8015](https://github.com/gustavo8015) | Servidor de monitoreo, app móvil y repositorio |
