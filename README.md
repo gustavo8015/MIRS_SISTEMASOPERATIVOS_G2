@@ -10,6 +10,8 @@ Proyecto de aula (ABP) de la asignatura **Sistemas Operativos**, Ingeniería de 
 | Lenguaje | Python 3.10 o superior (PC) y Java (app Android) |
 | Plataforma | Windows 10/11 (el núcleo de lectura también funciona en Linux); app para Android 8.0 o superior |
 | Estado | Versión 1.0.0 (final): app móvil MIRS Móvil con panel en vivo, procesos y alertas; conexión por Wi-Fi y Bluetooth; servidor de monitoreo con detección de anomalías |
+| Jonathan Soler Guevara | [jonsolerg-spec](https://github.com/jonsolerg-spec) | Pruebas de la app y documentación |
+| Sebastián Torrez Florez | [key-c3ll](https://github.com/key-c3ll) | Pruebas de la app y documentación |
 
 ## Contexto
 
