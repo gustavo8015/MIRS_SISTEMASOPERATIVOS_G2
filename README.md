@@ -294,3 +294,4 @@ Los mensajes siguen [Conventional Commits](https://www.conventionalcommits.org/e
 | Integrante | Usuario de GitHub | Aporte |
 |---|---|---|
 | Gustavo Adolfo Cardona Bayona | [gustavo8015](https://github.com/gustavo8015) | Servidor de monitoreo, app móvil y repositorio |
+| Jonathan Soler Guevara | [jonsolerg-spec](https://github.com/jonsolerg-spec) | Pruebas de la app y documentación |
