@@ -295,3 +295,4 @@ Los mensajes siguen [Conventional Commits](https://www.conventionalcommits.org/e
 |---|---|---|
 | Gustavo Adolfo Cardona Bayona | [gustavo8015](https://github.com/gustavo8015) | Servidor de monitoreo, app móvil y repositorio |
 | Jonathan Soler Guevara | [jonsolerg-spec](https://github.com/jonsolerg-spec) | Pruebas de la app y documentación |
+| Sebastián Torrez Florez | [key-c3ll](https://github.com/key-c3ll) | Pruebas de la app y documentación |
